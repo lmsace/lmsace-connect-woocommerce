@@ -1,0 +1,54 @@
+<?php
+/**
+ * List of all the user enrolled courses.
+ *
+ * @package lmsace-connect
+ */
+
+global $LACONN;
+
+$user = $LACONN->User->get_user();
+$courses = $LACONN->User->get_user_courses($user);
+
+if ( !empty($courses) ) {
+	?>
+
+	<div class="product-container" >
+		<div class="product-row row">
+
+	<?php
+	foreach ( $courses as $key => $course ) {
+
+		$courseid = $course->courseid;
+		// Get product id from the enrolled LMS course id.
+		$product_id = $course->productid;
+
+		if (empty($product_id)) continue;
+
+		$product = wc_get_product( $product_id );
+  		$thiscourseurl = $LACONN->site_url.'course/view.php?id='.$courseid;
+		?>
+			<div class="product-item col-md-3">
+				<div class="img-block">
+					<img src="<?php echo $this->get_product_image($product);?>" >
+				</div>
+				<div class="product-details">
+					<h4 class="product-name"> <a href="<?php echo $thiscourseurl; ?>"> <?php echo $product->get_name(); ?> </a> </h4>
+					<a class="button button-primary" href="<?php echo $thiscourseurl; ?>" > <?php echo __("View Course", 'lmsconnect'); ?> </a>
+				</div>
+			</div>
+		<?php
+	}
+	?>
+		</div>
+	</div>
+	<?php
+} else {
+	?>
+	<div class="no-enrolled-courses">
+		<h3> <?php echo __('Enrolled Courses Not Found..', LAC_TEXTDOMAIN); ?></h3>
+	</div>
+<?php
+}
+
+
