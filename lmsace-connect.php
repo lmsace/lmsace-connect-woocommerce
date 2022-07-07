@@ -7,7 +7,7 @@
  * Author: LMSACE
  * Author URI: https://www.lmsace.com/
  * Requires at least: 4.6+
- * Tested up to: 5.9.2
+ * Tested up to: 6.0
  * Requires PHP: 5.6
  *
  * WC requires at least: 3.0
@@ -22,7 +22,12 @@ if ( ! defined( 'WPINC' ) ) {
     die( 'No direct Access!' );
 }
 
+if ( ! defined( 'LAC_PLUGIN_FILE' ) ) {
+	define( 'LAC_PLUGIN_FILE', __FILE__ );
+}
+
 if ( !class_exists('LACONN_Main') ) {
+
 	// Initialize LACONN components.
 	// Contains all the functional parts inclusion.
 	require_once( __DIR__ .'/includes/class-lac.php' );
@@ -35,11 +40,11 @@ if ( !class_exists('LACONN_Main') ) {
 
 	function lmsace_connect_settings_link($links) {
 		$connection = admin_url().'admin.php?page=lac-connection-options';
-		$settings_link = '<a href="'.$connection.'">'.__('Settings', 'lmsace-connect').'</a>';
+		$settings_link = '<a href="'.$connection.'">'.esc_html(__('Settings', 'lmsace-connect')).'</a>';
 		array_unshift($links, $settings_link);
 		return $links;
 	}
-	$plugin = plugin_basename(__FILE__);
+	$plugin = plugin_basename( __FILE__ );
 	add_filter("plugin_action_links_$plugin", 'lmsace_connect_settings_link' );
 
 	/**

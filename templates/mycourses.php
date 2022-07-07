@@ -30,11 +30,11 @@ if ( !empty($courses) ) {
 		?>
 			<div class="product-item col-md-3">
 				<div class="img-block">
-					<img src="<?php echo $this->get_product_image($product);?>" >
+					<img src="<?php echo esc_attr( $this->get_product_image($product) );?>" >
 				</div>
 				<div class="product-details">
-					<h4 class="product-name"> <a href="<?php echo $thiscourseurl; ?>"> <?php echo $product->get_name(); ?> </a> </h4>
-					<a class="button button-primary" href="<?php echo $thiscourseurl; ?>" > <?php echo __("View Course", 'lmsconnect'); ?> </a>
+					<h4 class="product-name"> <a href="<?php echo esc_attr( $thiscourseurl ); ?>"> <?php echo esc_html( $product->get_name() ); ?> </a> </h4>
+					<a class="button button-primary" href="<?php echo esc_attr( $thiscourseurl ); ?>" > <?php echo esc_html( __("View Course", 'lmsconnect') ); ?> </a>
 				</div>
 			</div>
 		<?php
@@ -46,7 +46,7 @@ if ( !empty($courses) ) {
 } else {
 	?>
 	<div class="no-enrolled-courses">
-		<h3> <?php echo __('Enrolled Courses Not Found..', LAC_TEXTDOMAIN); ?></h3>
+		<h3> <?php echo esc_html( __('Enrolled Courses Not Found..', LAC_TEXTDOMAIN) ); ?></h3>
 	</div>
 <?php
 }

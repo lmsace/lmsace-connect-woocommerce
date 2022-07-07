@@ -136,7 +136,7 @@ class LACONN_Log extends LACONN_Main {
 
         if ( $this->create( $method ) && $this->is_writable( $method ) ) {
             $time = date_i18n( 'm-d-Y @ H:i:s -' );
-            fwrite( $this->handles[$method], $time . ': '. $message . " \n " );
+            fwrite( $this->handles[$method], $time . ': '. sanitize_text_field( $message ) . " \n " );
         }
     }
 }

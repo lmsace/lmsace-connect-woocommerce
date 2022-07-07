@@ -101,10 +101,10 @@ class LACONN_Admin_request extends LACONN_Main {
 						$count .= (count($counts['existing'])) ? count($counts['existing']).' courses exists. ' : '';					}
 
 					$result = array('error' => false, 'message' => '<span class="connection-success">'.
-						sprintf(__( 'Courses import completed - %s ', LAC_TEXTDOMAIN ), $count).'</span>'
+						sprintf( esc_html( __( 'Courses import completed - %s ', LAC_TEXTDOMAIN ) ), $count).'</span>'
 					);
 				} else {
-					$result = array('error' => true, 'message' => '<span class="connection-error">'.__( 'Courses not found on connected LMS site', LAC_TEXTDOMAIN )).'</span>';
+					$result = array('error' => true, 'message' => '<span class="connection-error">'. esc_html(__( 'Courses not found on connected LMS site', LAC_TEXTDOMAIN ))).'</span>';
 				}
 
 			} else {
@@ -113,7 +113,7 @@ class LACONN_Admin_request extends LACONN_Main {
 				if (!empty($count)) {
 					$split = array_chunk($selectedcourses, LACONN_IMPORT_LIMIT);
 					$this->courseSync->set_schedule_course_import( $split, $assign_category, $make_draft, $update_existing );
-					$message = __('Courses import process running in background. Please staty logged in.', LAC_TEXTDOMAIN);
+					$message = esc_html( __('Courses import process running in background. Please staty logged in.', LAC_TEXTDOMAIN));
 					$result = array('error' => false, 'message' => '<span class="connection-info">'.$message.'</span>' );
 					$LACONN->set_admin_notices('info', $message, 'import', true);
 				}

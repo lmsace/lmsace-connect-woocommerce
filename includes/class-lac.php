@@ -59,13 +59,14 @@ class LACONN {
 
 		$this->define();
 
-		$this->dirroot = ABSPATH . 'wp-content/plugins/lmsace-connect';
-		$this->wwwroot = plugins_url().'/lmsace-connect/';
+		$this->dirroot = dirname( LAC_PLUGIN_FILE );
+		$this->wwwroot = plugin_dir_url(__DIR__);
+
 		$options = get_option( 'lac_connection_settings' );
 		$generaloptions = get_option( 'lac_general_settings' );
-		$this->options = $options;
+		$this->options = (is_array($options)) ? $options : [];
 		if (is_array($generaloptions)) {
-			$this->options = array_merge($options, $generaloptions);
+			$this->options = array_merge($this->options, $generaloptions);
 		}
 		$this->site_token = isset($options['site_token']) ? $options['site_token'] : '';
 		$this->site_url = isset($options['site_url']) ? $options['site_url'] : '';
@@ -224,9 +225,9 @@ class LACONN {
 	public function get_options() {
 		$options = get_option( 'lac_connection_settings' );
 		$generaloptions = get_option( 'lac_general_settings' );
-		$this->options = $options;
+		$this->options =  (is_array($options)) ? $options : [];
 		if (is_array($generaloptions)) {
-			$this->options = array_merge($options, $generaloptions);
+			$this->options = array_merge($this->options, $generaloptions);
 		}
 		return $this->options;
 	}
@@ -275,12 +276,12 @@ class LACONN {
 		$error = false;
 		require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
 
-		if ( !file_exists(WP_PLUGIN_DIR.'/woocommerce/woocommerce.php') ) {
+		if ( !file_exists( WP_PLUGIN_DIR.'/woocommerce/woocommerce.php' ) ) {
 			$error = true;
-			$message = __( 'You must install and activate WooCommerce plugin to use this LMSACE Connect plugin. ', 'lmsace-connect', 'dependencycheck' );
+			$message = esc_html(__( 'You must install and activate WooCommerce plugin to use this LMSACE Connect plugin. ', 'lmsace-connect', 'dependencycheck' ));
 		} else if ( !is_plugin_active('woocommerce/woocommerce.php') ) {
 			$error = true;
-			$message = __('You must activate WooCommerce plugin to use this LMSACE Connect plugin.', 'lmsace-connect', 'dependencycheck');
+			$message = esc_html(__('You must activate WooCommerce plugin to use this LMSACE Connect plugin.', 'lmsace-connect', 'dependencycheck'));
 		}
 		if ($error) {
 			if ( $die ) {
@@ -303,7 +304,7 @@ class LACONN {
 	 */
 	public function woocommerce_version_check() {
 		if ( version_compare( WC_VERSION, '3.0', '<' ) ) {
-			$message = __('Not compatible with installed woocommerce plugin, Please upgrade your woocommerce', 'lmsace-connect');
+			$message = esc_html(__('Not compatible with installed woocommerce plugin, Please upgrade your woocommerce', 'lmsace-connect'));
 			$this->set_admin_notices('error', $message);
 		}
 	}
@@ -316,7 +317,7 @@ class LACONN {
 	public function is_setup_completed() {
 		$options = $this->get_options();
 		if (!isset($options['site_url']) || empty($options['site_url'])) {
-			$this->set_admin_notices('warning', '<h4> LMSACE Connect </h4>'.sprintf( __(' <p> <b>You need to specify a Moodle LMS domain and a Moodle LMS Access token.</b> You must <a href="%s">enter your domain and API key</a> for it to work.</p> ', 'lmsace-connect'), 'admin.php?page=lac-admin-settings'), 'connection', true);
+			$this->set_admin_notices('warning', '<h4> LMSACE Connect </h4>'.sprintf( esc_html(__(' <p> <b>You need to specify a Moodle LMS domain and a Moodle LMS Access token.</b> You must <a href="%s">enter your domain and API key</a> for it to work.</p> ', 'lmsace-connect'), ['p', 'a']), 'admin.php?page=lac-admin-settings'), 'connection', true);
 		} else {
 			$request = $this->Client->request(self::services('get_user_roles'), array(), false);
 			if ($request) {
@@ -324,7 +325,7 @@ class LACONN {
 					!$this->Client->is_valid_response($request['response_code']);
 			}
 			if (empty($request) || (isset($exception) && $exception)) {
-				$this->set_admin_notices('error', '<h4> LMSACE Connect </h4>'. __('Moodle and WooCommerce connection failed! Please check your details '), 'connection', true);
+				$this->set_admin_notices('error', '<h4> LMSACE Connect </h4>'. esc_html(__('Moodle and WooCommerce connection failed! Please check your details ', 'lmsace-connect')), 'connection', true);
 			}
 		}
 	}
@@ -355,21 +356,27 @@ class LACONN {
 		if (!isset($_SESSION['lac_admin_flash']) ) {
 			$_SESSION['lac_admin_flash'] = array();
 		}
-		$flash_message = $_SESSION['lac_admin_flash'];
+
+		$flash_message = [];
+
+		array_walk( $_SESSION['lac_admin_flash'], function($value, $key) use (&$flash_message) {
+			$flash_message[$key] = array_map( 'esc_attr', $value );
+		});
 
 		apply_filters( 'lac_admin_notices', $flash_message );
 
 		foreach ($flash_message as $key => $message) {
+
 			if ($message['type'] == 'error') {
 				?>
 				<div class="notice notice-error is-dismissible lmsace-notice">
-					<p> <?php echo $message['message']; ?> </p>
+					<p> <?php echo esc_attr( $message['message'] ); ?> </p>
 				</div>
 				<?php
 			} else {
 				?>
-				<div class="notice notice-<?php echo $message['type']; ?> is-dismissible lmsace-notice">
-					<p> <?php echo $message['message']; ?> </p>
+				<div class="notice notice-<?php echo esc_attr( $message['type'] ); ?> is-dismissible lmsace-notice">
+					<p> <?php echo esc_attr( $message['message'] ); ?> </p>
 				</div>
 				<?php
 			}
@@ -397,7 +404,7 @@ class LACONN {
 			$_SESSION['lac_admin_flash'] = array();
 		}
 
-		$_SESSION['lac_admin_flash'][$name] = array( 'type' => $type, 'message' => $message, 'remove' => $remove );
+		$_SESSION['lac_admin_flash'][$name] = array( 'type' => $type, 'message' => sanitize_text_field( $message ), 'remove' => $remove );
 	}
 
 	public function remove_admin_notices($name) {

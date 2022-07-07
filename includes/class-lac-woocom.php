@@ -122,7 +122,7 @@ class LACONN_Woocom extends LACONN_Main {
 	 */
 	public function create_order_enrollment() {
 		if (isset($_POST['order_id']) && !empty($_POST['order_id'])) {
-			$result = $this->process_order_completed($_POST['order_id']);
+			$result = $this->process_order_completed( sanitize_text_field( $_POST['order_id'] ) );
 		}
 
 		echo json_encode(['error' => !$result ]);
@@ -136,7 +136,7 @@ class LACONN_Woocom extends LACONN_Main {
 			?>
 		    <div class="notice notice-error is-dismissible lmsace-notice">
 				<h4> <?php echo 'LMSACE Connect'; ?> </h4>
-		        <p><?php _e( 'Disable the guest checkout on woocommerce..', 'lmsace-connect' ); ?></p>
+		        <p><?php esc_html_e( 'Disable the guest checkout on woocommerce..', 'lmsace-connect' ); ?></p>
 		    </div>
 		    <?php
 		}
@@ -217,16 +217,16 @@ class LACONN_Woocom extends LACONN_Main {
 							$LACONN->logger()->add( 'order', ' Updated enrolments in order meta - '.json_encode($enrolments));
 							foreach ($enrolments as $enrolment) {
 								if (isset( $enrolment['courseid'] ) )
-									$LACONN->set_admin_notices( 'success', sprintf ( __('User %1s enrolled on the courses', 'lmsace-connect'), $details['user']->user_login ) );
+									$LACONN->set_admin_notices( 'success', sprintf ( esc_html( __('User %1s enrolled on the courses', 'lmsace-connect') ), $details['user']->user_login ) );
 							}
 						}
 					}
 				} else {
 					$details['order']->update_meta_data( 'lac_enrolments', [] );
-					$LACONN->set_admin_notices( 'error', __('Can\'t able to create user in Moodle', 'lmsace-connect') );
+					$LACONN->set_admin_notices( 'error', esc_html( __('Can\'t able to create user in Moodle', 'lmsace-connect') ) );
 				}
 			} else {
-				$LACONN->set_admin_notices( 'error', __('Order user not created in WordPress', 'lmsace-connect') );
+				$LACONN->set_admin_notices( 'error', esc_html( __('Order user not created in WordPress', 'lmsace-connect')) );
 			}
 			$t = $details['order']->save();
 		}
@@ -292,7 +292,7 @@ class LACONN_Woocom extends LACONN_Main {
 
 					if ( $result ) {
 						foreach ($enrolments as $enrolment) {
-							$LACONN->set_admin_notices( 'success', sprintf (__('User %1s enrolment suspended in the course ', 'lmsace-connect'), $user->user_login, $md_course_id ) );
+							// $LACONN->set_admin_notices( 'success', sprintf ( esc_html( __('User %1s enrolment suspended in the course ', 'lmsace-connect') ), $user->user_login, $md_course_id ) );
 						}
 					}
 				}
@@ -404,7 +404,7 @@ class LACONN_Woocom extends LACONN_Main {
 
 		add_meta_box(
 			'lac_order_enrollment', // Unique ID.
-			__('LMSACE Connect user enrollment notes'), // Title.
+			esc_html(__('LMSACE Connect user enrollment notes')), // Title.
 			array( $this, 'user_enrollment_meta_callback' ), // Callback.
 			'shop_order', // Screen
 			'side',
@@ -422,7 +422,7 @@ class LACONN_Woocom extends LACONN_Main {
 			$enrolments = get_post_meta($order_id, 'lac_enrolments', true);
 		}
 		if (empty($enrolments)) {
-			echo __("Order doesn't contain any enrolments in LMS", LAC_TEXTDOMAIN);
+			echo esc_html_e("Order doesn't contain any enrolments in LMS", LAC_TEXTDOMAIN);
 			return false;
 		}
 		$users = array_column($enrolments, 'userid');
@@ -439,11 +439,11 @@ class LACONN_Woocom extends LACONN_Main {
 				$list .= '<div class="enrolment-status-item">';
 				$list .= '<p class="enrolment-status-message">';
 				if (isset($enrol['suspend']) && $enrol['suspend']) {
-					$list .= sprintf( __("User with email %s, suspended in the course %s ", 'lmsace-connect'), $email, $coursename);
+					$list .= sprintf( esc_html( __("User with email %s, suspended in the course %s ", 'lmsace-connect') ), $email, $coursename);
 				} else {
-					$list .= sprintf( __("User with email %s, enrolled in the course %s ", 'lmsace-connect'), $email, $coursename);
+					$list .= sprintf( esc_html( __("User with email %s, enrolled in the course %s ", 'lmsace-connect') ), $email, $coursename);
 				}
-				$list .= '<a href="'.$this->site_url.'course/view.php?id='.$moodle_courseid.'">'. __( '( View course on LMS )', 'lmsace-connect').'</a>';
+				$list .= '<a href="'.$this->site_url.'course/view.php?id='.$moodle_courseid.'">'. esc_html( __( '( View course on LMS )', 'lmsace-connect')).'</a>';
 				$list .= '</p>';
 				$list .= '</div>';
 			}
@@ -482,7 +482,7 @@ class LACONN_Woocom extends LACONN_Main {
 	  */
 	function my_account_menu_order($items) {
 		$position = array_search('downloads', array_keys($items));
-		$mycourses = array('mycourses' => __('My Courses', 'lmsace-connect') );
+		$mycourses = array('mycourses' => esc_html( __('My Courses', 'lmsace-connect') ) );
 	 	$items = array_merge( array_slice($items, 0, $position, true), $mycourses, array_slice($items, $position, null, true) );
 	 	return $items;
 	}

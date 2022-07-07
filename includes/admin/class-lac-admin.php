@@ -42,9 +42,9 @@ class LACONN_Admin extends LACONN_Main {
 	 */
 	public function get_tabs() {
 		return [
-			'lac-connection-options' => __( 'Connection Setup' ),
-			'lac-general-options' => __('General Setup'),
-			'lac-import-courses' => __( 'Import Courses' ),
+			'lac-connection-options' => esc_html( __( 'Connection Setup', 'lmsace-connect' )),
+			'lac-general-options' => esc_html( __('General Setup', 'lmsace-connect' )),
+			'lac-import-courses' => esc_html( __('Import Courses', 'lmsace-connect' )),
 		];
 	}
 
@@ -80,15 +80,15 @@ class LACONN_Admin extends LACONN_Main {
 
 		wp_enqueue_script( 'jquery-form' );
 
-		wp_enqueue_style('select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css' );
-		wp_enqueue_script('select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js', array('jquery') );
+		wp_enqueue_style('select2', $this->wwwroot . '/assets/css/select2.min.css' );
+		wp_enqueue_script('select2', $this->wwwroot . '/assets/js/select2.min.js', array('jquery') );
 
 		// Data table js file from CDN.
-		wp_enqueue_style('jquery-datatables-css','//cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css');
-        wp_enqueue_script('jquery-datatables-js','//cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js',array('jquery'));
+		wp_enqueue_style('jquery-datatables-css', $this->wwwroot . '/assets/css/jquery.dataTables.min.css');
+        wp_enqueue_script('jquery-datatables-js', $this->wwwroot . '/assets/js/jquery.dataTables.min.js',array('jquery'));
 		// Select addon for datatable.js
-		wp_enqueue_script('jquery-datatables-select-js','//cdn.datatables.net/select/1.3.4/js/dataTables.select.min.js');
-		wp_enqueue_style('jquery-datatables-select-css','https://cdn.datatables.net/select/1.3.4/css/select.dataTables.min.css');
+		wp_enqueue_script('jquery-datatables-select-js', $this->wwwroot . '/assets/js/dataTables.select.min.js');
+		wp_enqueue_style('jquery-datatables-select-css', $this->wwwroot . '/assets/css/select.dataTables.min.css');
 
 		// Plugin styles for admin.
 		wp_enqueue_style('LACONN', $this->wwwroot.'/assets/css/styles.css' );
@@ -100,14 +100,14 @@ class LACONN_Admin extends LACONN_Main {
 			'nonce' => wp_create_nonce(NONCEKEY),
 			'loaderurl' => admin_url('images/loading.gif'),
 			'strings' => [
-				'allcategories' => __('All Categories', 'lmsace-connect'),
-				'reloadcourses' => __('Reload Courses', 'lmsace-connect'),
-				'filtercategories' => __('Filter category', 'lmsace-connect'),
-				'settingssaved' => __('Settings saved successfully', 'lmsace-connect'),
+				'allcategories' => esc_html( __('All Categories', 'lmsace-connect')),
+				'reloadcourses' => esc_html( __('Reload Courses', 'lmsace-connect')),
+				'filtercategories' => esc_html( __('Filter category', 'lmsace-connect')),
+				'settingssaved' => esc_html(__('Settings saved successfully', 'lmsace-connect')),
 			]
 		);
 
-		wp_localize_script('lac-admin-scripts', 'lac_jsdata', $jsdata );
+		wp_localize_script( 'lac-admin-scripts', 'lac_jsdata', $jsdata );
 	}
 
 	/**
@@ -131,18 +131,20 @@ class LACONN_Admin extends LACONN_Main {
 
 			if (isset($_REQUEST['callback']) && !empty($_REQUEST['callback']) ) {
 				// Callback function from ajax request.
-				$callback = $_REQUEST['callback'];
+				$callback = sanitize_text_field( $_REQUEST['callback'] );
 				// Check method exsits on client.
-				$args = isset($_REQUEST['args']) ? $_REQUEST['args'] : array();
+				array_walk( $_REQUEST['args'], function($value, $key) use (&$args) {
+					$args[$key] = (is_array($value)) ? array_map('sanitize_text_field', $value) : sanitize_text_field($value);
+				});
 
 				if (method_exists($this->admin_request, $callback )) {
 					// Call the callback method from the client.
 					$result = call_user_func_array(array($this->admin_request, $callback), $args );
 				} else {
-					$result['msg'] = __('Callback function not available.', 'lmsace_lac');
+					$result['msg'] = esc_html( __('Callback function not available.', 'lmsace-connect') );
 				}
 			} else {
-				$result['msg'] = __('Callback function not added.', 'lmsace_lac');
+				$result['msg'] = esc_html( __('Callback function not added.', 'lmsace-connect') );
 			}
 		}
 
@@ -167,7 +169,7 @@ class LACONN_Admin extends LACONN_Main {
 				if (isset($file->fileurl) && !empty($file->fileurl) ) {
 					$fileurl = $file->fileurl.'?token='.$this->site_token;
 				}
-				return (isset($fileurl)) ? $fileurl : $defaultimage;
+				return (isset($fileurl)) ? sanitize_url( $fileurl ) : $defaultimage;
 			}
 		}
 		return $defaultimage;
@@ -184,7 +186,7 @@ class LACONN_Admin extends LACONN_Main {
 		global $LACONN;
 		$doc = new DOMDocument();
 		if (empty($course->summary)) {
-			return $course->summary;
+			return sanitize_textarea_field( $course->summary );
 		}
 		@$doc->loadHTML($course->summary);
 		$tags = $doc->getElementsByTagName('img');
@@ -198,9 +200,9 @@ class LACONN_Admin extends LACONN_Main {
 		if (!empty($images)) {
 			$updated = $LACONN->Course->upload_product_image($post_id, $images, 'course_summary');
 			$summary = strtr($course->summary, array_combine($src, $updated));
-			return $summary;
+			return sanitize_textarea_field( $summary );
 		}
-		return $course->summary;
+		return sanitize_textarea_field( $course->summary );
 	}
 
 	/**
@@ -211,8 +213,8 @@ class LACONN_Admin extends LACONN_Main {
 	public function admin_settings() {
 
 	    add_menu_page(
-	        __('LMSACE Connect', LAC_TEXTDOMAIN),
-	        __('LMSACE Connect', LAC_TEXTDOMAIN),
+	        esc_html( __('LMSACE Connect', LAC_TEXTDOMAIN)),
+	        esc_html( __('LMSACE Connect', LAC_TEXTDOMAIN)),
 	        'manage_options',
 	        'lac-admin-settings',
 	        array( $this, 'admin_setting_tabs'),
@@ -221,8 +223,8 @@ class LACONN_Admin extends LACONN_Main {
 
 		add_submenu_page(
 			"lac-admin-settings",
-			__('Connection', LAC_TEXTDOMAIN),
-			__('Connection', LAC_TEXTDOMAIN),
+			esc_html( __('Connection', LAC_TEXTDOMAIN)),
+			esc_html( __('Connection', LAC_TEXTDOMAIN)),
 			'manage_options',
 			"lac-connection-options",
 			array( $this, 'admin_setting_connectionsetup')
@@ -230,8 +232,8 @@ class LACONN_Admin extends LACONN_Main {
 
 		add_submenu_page(
 			"lac-admin-settings",
-			__('General', LAC_TEXTDOMAIN),
-			__('General', LAC_TEXTDOMAIN),
+			esc_html( __('General', LAC_TEXTDOMAIN) ),
+			esc_html( __('General', LAC_TEXTDOMAIN) ),
 			'manage_options',
 			"lac-general-options",
 			array( $this, 'admin_setting_generaloptions')
@@ -239,8 +241,8 @@ class LACONN_Admin extends LACONN_Main {
 
 		add_submenu_page(
 			"lac-admin-settings",
-			__('Import courses', LAC_TEXTDOMAIN),
-			__('Import courses', LAC_TEXTDOMAIN),
+			esc_html( __('Import courses', LAC_TEXTDOMAIN) ),
+			esc_html( __('Import courses', LAC_TEXTDOMAIN) ),
 			'manage_options',
 			"lac-import-courses",
 			array( $this, 'admin_setting_importcourses')
@@ -284,7 +286,7 @@ class LACONN_Admin extends LACONN_Main {
 	 	echo '<h2 class="nav-tab-wrapper">';
 	    foreach ( $tabs as $tab => $name ){
 	        $class = ( $tab == $current ) ? ' nav-tab-active' : '';
-	        echo "<a class='nav-tab $class' href='?page=$tab'>$name</a>";
+	        echo "<a class='nav-tab $class' href='?page=$tab'> ".esc_html( $name ) ."</a>";
 	    }
 	    echo '</h2>';
 
@@ -302,7 +304,7 @@ class LACONN_Admin extends LACONN_Main {
 	 * @return void
 	 */
 	public function sitedetails_admin_tabcontent() {
-		
+
 	?>
 	<?php settings_errors(); ?>
 		<div class="lac-results"></div>
@@ -338,11 +340,11 @@ class LACONN_Admin extends LACONN_Main {
 		settings_errors();
 	?>
 		<div class="wrap">
-		 	<!-- <h2> <?php echo __('Selective Courses import', 'lmsace-connect'); ?> </h2> -->
+		 	<!-- <h2> <?php echo esc_html( __('Selective Courses import', 'lmsace-connect') ); ?> </h2> -->
 			<div class="import-courses">
-				<h2> <?php echo __('Selective courses import', LAC_TEXTDOMAIN); ?> </h2>
-				<p> <?php echo __('Select the courses in the table and click the button "Start import courses" in the bottom to start the courses import ', LAC_TEXTDOMAIN); ?> </p>
-				<p> <?php echo sprintf( __('If you try to import more than %s courses in single import, LMSACE Connect will import the courses in background.', LAC_TEXTDOMAIN), LACONN_IMPORT_LIMIT); ?> </p>
+				<h2> <?php echo esc_html( __('Selective courses import', LAC_TEXTDOMAIN) ); ?> </h2>
+				<p> <?php echo esc_html( __('Select the courses in the table and click the button "Start import courses" in the bottom to start the courses import ', LAC_TEXTDOMAIN) ); ?> </p>
+				<p> <?php echo sprintf( esc_html( __('If you try to import more than %s courses in single import, LMSACE Connect will import the courses in background.', LAC_TEXTDOMAIN) ), LACONN_IMPORT_LIMIT); ?> </p>
 				<?php $this->import_courses_list(); ?>
 			</div>
 		 	<form method="post" action="options.php">
@@ -364,15 +366,15 @@ class LACONN_Admin extends LACONN_Main {
 		if (!empty($data) && isset($data['site_url'])) {
 
 			$result = LACONN()->get_handler('admin-request', 'admin')
-				->test_connection($data['site_url'], $data['site_token']);
+				->test_connection( sanitize_url( $data['site_url'] ), sanitize_text_field( $data['site_token'] ) );
 
 			if (isset($result['error']) && $result['error'] == true) {
-				LACONN()->set_admin_notices('error', $result['message'], 'connection');
+				LACONN()->set_admin_notices('error', esc_html( $result['message'] ), 'connection');
 			} else {
 				LACONN()->remove_admin_notices('connection');
 			}
 		} else {
-			$request = $LACONN->Client->request(LACONN::services('get_user_roles'), array(), false);
+			$request = $LACONN->Client->request( LACONN::services('get_user_roles'), array(), false);
 			if (!empty($request)) {
 				$exception = $LACONN->Client->hasException($request, true, false) ||
 					!$LACONN->Client->is_valid_response($request['response_code']);
@@ -420,7 +422,7 @@ class LACONN_Admin extends LACONN_Main {
 		// Import options like create category, make draft.
 	    add_settings_field(
 	        'lac_import_options',
-	        __( 'Import options', LAC_TEXTDOMAIN ),
+	        esc_html( __( 'Import options', LAC_TEXTDOMAIN) ),
 	        array($this, 'course_import_options'),
 	        'lac-import-settings',
 	        'import_settings_section'
@@ -437,14 +439,14 @@ class LACONN_Admin extends LACONN_Main {
 	    /* Site connection details */
 	    add_settings_section(
 	        'connection_settings_section',
-	        __( 'LMS Connection Setup', LAC_TEXTDOMAIN ),
+	        esc_html(__( 'LMS Connection Setup', LAC_TEXTDOMAIN )),
 	        array($this, 'section_connection_settings'),
 	        'lac-site-settings'
 	    );
 		// Site Connection URL.
 	    add_settings_field(
 	        'site_url',
-	        __( 'Moodle LMS Site URL', LAC_TEXTDOMAIN ),
+	        esc_html(__( 'Moodle LMS Site URL', LAC_TEXTDOMAIN )),
 	        array($this, 'siteUrl'),
 	        'lac-site-settings',
 	        'connection_settings_section'
@@ -452,7 +454,7 @@ class LACONN_Admin extends LACONN_Main {
 		//  Moodle token to connect.
 	    add_settings_field(
 	        'site_token',
-	        __( 'Moodle LMS Access Token', LAC_TEXTDOMAIN ),
+	        esc_html(__( 'Moodle LMS Access Token', LAC_TEXTDOMAIN )),
 	       array($this, 'siteToken'),
 	        'lac-site-settings',
 	        'connection_settings_section'
@@ -470,7 +472,7 @@ class LACONN_Admin extends LACONN_Main {
 		// Import selected courses - hidden field
 	    add_settings_section(
 	        'lac_general_options',
-			__('General options', 'lmsace-connect'),
+			esc_html(__('General options', 'lmsace-connect')),
 	        array($this, 'general_config_section'),
 	        'lac-general-settings'
 	    );
@@ -485,7 +487,7 @@ class LACONN_Admin extends LACONN_Main {
 		// User order refund method in moodle enrollment.
 	    add_settings_field(
 	        'refund_suspend',
-	        __( 'User enrolment status on Order Refund/Cancellation', 'lmsace-connect' ),
+	        esc_html( __( 'User enrolment status on Order Refund/Cancellation', 'lmsace-connect' ) ),
 	        array($this, 'refund_suspend'),
 	        'lac-general-settings',
 	        'lac_general_options'
@@ -493,7 +495,7 @@ class LACONN_Admin extends LACONN_Main {
 		// Customer role in moodle course. - default student.
 		add_settings_field(
 	        'student_role',
-	        __( 'Select a role for the participants in Moodle LMS', 'lmsace-connect' ),
+	        esc_html( __( 'Select a role for the participants in Moodle LMS', 'lmsace-connect' ) ),
 	        array($this, 'student_role_config'),
 	        'lac-general-settings',
 	        'lac_general_options'
@@ -542,7 +544,7 @@ class LACONN_Admin extends LACONN_Main {
 	public function siteUrl() {
 		$options = get_option( 'lac_connection_settings' );
     ?>
-	    <input type="text" name='lac_connection_settings[site_url]' class="form" value="<?php echo isset($options['site_url']) ? $options['site_url'] : ''; ?>" >
+	    <input type="text" name='lac_connection_settings[site_url]' class="form" value="<?php echo isset($options['site_url']) ? sanitize_url($options['site_url']) : ''; ?>" >
     <?php
 	}
 
@@ -554,7 +556,7 @@ class LACONN_Admin extends LACONN_Main {
 	public function siteToken() {
 		$options = get_option( 'lac_connection_settings' );
     ?>
-	    <input type="text" name='lac_connection_settings[site_token]' class="form" value="<?php echo isset($options['site_token']) ? $options['site_token'] : ''; ?>" >
+	    <input type="text" name='lac_connection_settings[site_token]' class="form" value="<?php echo isset($options['site_token']) ? sanitize_text_field( $options['site_token'] ) : ''; ?>" >
 		<p class="text-dimmed">You can read how to generate token in <a href="https://lmsace.com/docs/lmsace-connect#generate-webservice"> Creating Webservice Token </a> </p>
 	<?php
 	}
@@ -567,13 +569,13 @@ class LACONN_Admin extends LACONN_Main {
 	public function test_connection() {
 		$exception = $this->lac_connection_settings_validate([]);
 		if (empty($exception)) {
-			$connection = '<span class="connection-success"> '.__(' Connected successfully ', 'lmsace-connect').'</span>';
+			$connection = '<span class="connection-success"> '. esc_html( __(' Connected successfully ', 'lmsace-connect') ).'</span>';
 		} else if (!empty($this->options['site_token'])) {
-			$connection = '<span class="connection-error"> '. __('Connection Failed', 'lmsace-connect').'</span>';
+			$connection = '<span class="connection-error"> '. esc_html( __('Connection Failed', 'lmsace-connect') ).'</span>';
 		}
 	?>
 		<p class="test-connection">
-			<input type="button" class="button secondary" id="test_connection"  value="<?php echo __('Connect', 'lmsace-connect'); ?>" >
+			<input type="button" class="button secondary" id="test_connection"  value="<?php echo esc_html( __('Connect', 'lmsace-connect')); ?>" >
 			<span class="result"> <?php echo isset($connection) ? $connection : ''; ?> </span>
 		</p>
 	<?php
@@ -588,11 +590,11 @@ class LACONN_Admin extends LACONN_Main {
 		$options = get_option( 'lac_general_settings' );
 		?>
 		<select name='lac_general_settings[refund_suspend]' class="form" >
-			<option value="<?php echo LACONN_SUSPEND;?>" <?php echo (isset($options['refund_suspend']) && $options['refund_suspend'] == LACONN_SUSPEND)  ? 'selected':'';?> >
-				<?php echo  __('Suspend', LAC_TEXTDOMAIN);?>
+			<option value="<?php echo LACONN_SUSPEND; ?>" <?php echo (isset($options['refund_suspend']) && $options['refund_suspend'] == LACONN_SUSPEND)  ? 'selected':'';?> >
+				<?php echo  esc_html( __('Suspend', LAC_TEXTDOMAIN) ); ?>
 			</option>
-			<option value="<?php echo LACONN_UNENROL;?>" <?php echo (isset($options['refund_suspend']) && $options['refund_suspend'] == LACONN_UNENROL)  ? 'selected':'';?> >
-				<?php echo  __('Unenrol', LAC_TEXTDOMAIN);?>
+			<option value="<?php echo LACONN_UNENROL; ?>" <?php echo (isset($options['refund_suspend']) && $options['refund_suspend'] == LACONN_UNENROL)  ? 'selected':'';?> >
+				<?php echo  esc_html( __('Unenrol', LAC_TEXTDOMAIN) ); ?>
 			</option>
 		<?php
 	}
@@ -621,7 +623,7 @@ class LACONN_Admin extends LACONN_Main {
 			<?php foreach (array_reverse($roles) as $role) :
 				if (isset($role->name)) {
 				?>
-				<option value="<?php echo $role->id;?>" <?php echo (isset($options['student_role']) && ($role->id == $options['student_role']) ) ? 'selected="selected"' : ''; ?> > <?php echo $role->name; ?></option>;
+				<option value="<?php echo esc_attr( $role->id );?>" <?php echo (isset($options['student_role']) && ($role->id == $options['student_role']) ) ? 'selected="selected"' : ''; ?> > <?php echo esc_html( $role->name ); ?></option>;
 			<?php  }
 			endforeach; ?>
 		</select>
@@ -685,19 +687,19 @@ class LACONN_Admin extends LACONN_Main {
     ?>
 	    <p>
 	    	<input type="checkbox" name="lac_import_settings[import_options][]" value="course" checked disabled>
-	    	<?php echo __('Import selected courses as WooCommerce product.');  ?>
+	    	<?php echo esc_html( __('Import selected courses as WooCommerce product.') );  ?>
 		</p>
 		<p>
 	    	<input type="checkbox" name="lac_import_settings[import_options][]" value="course_draft" >
-	    	<?php echo __('Import selected courses as product and save as draft.'); ?>
+	    	<?php echo esc_html( __('Import selected courses as product and save as draft.') ); ?>
 	    </p>
 		<p>
 	    	<input type="checkbox" name="lac_import_settings[import_options][]" value="update_existing" >
-	    	<?php echo __('Update the existing linked product data with current course content.'); ?>
+	    	<?php echo esc_html( __('Update the existing linked product data with current course content.') ); ?>
 	    </p>
 	    <p>
 	    	<input type="checkbox" name="lac_import_settings[import_options][]" value="course_category" >
-	    	<?php echo __('Import selected courses with its category.'); ?>
+	    	<?php echo esc_html( __('Import selected courses with its category.') ); ?>
 		</p>
     <?php
 	}

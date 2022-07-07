@@ -69,7 +69,7 @@ class LACONN_Course extends LACONN_Main {
 		if (!empty($courses)) {
 			$importcourses = array_shift($courses);
 			$courseids = implode(',', $importcourses);
-			$LACONN->logger()->add( 'course', __('Init course import for :'.$courseids, LAC_TEXTDOMAIN));
+			$LACONN->logger()->add( 'course', esc_html(__('Init course import for :'.$courseids, LAC_TEXTDOMAIN) ));
 
 			$response = (array) $LACONN->Client->request(LACONN::services('get_courses_by_field'),
 				array(
@@ -82,10 +82,10 @@ class LACONN_Course extends LACONN_Main {
 				// Create course.
 				$result = $this->create_courses($response['courses'], $assign_category, $make_draft, $update_existing );
 				$this->set_session_data('LAC_import_selected_courses', $courses);
-				$this->set_session_data('course_import_info', __('Course import process running in background!', LAC_TEXTDOMAIN));
+				$this->set_session_data('course_import_info', esc_html( __('Course import process running in background!', LAC_TEXTDOMAIN )) );
 			}
 		} else {
-			$this->set_session_data('course_import_completes', __('All courses are imported successfully!', LAC_TEXTDOMAIN));
+			$this->set_session_data('course_import_completes', esc_html( __('All courses are imported successfully!', LAC_TEXTDOMAIN) ) );
 			$this->set_session_data('LAC_import_selected_courses', false);
 			$this->set_session_data('course_import_info', false);
 			wp_clear_scheduled_hook('lac_import_courses_action');
@@ -102,7 +102,7 @@ class LACONN_Course extends LACONN_Main {
 	function lac_cron_definer($schedules) {
 		$schedules['minutes'] = array(
 			'interval'=> 30,
-			'display'=>  __('Once Every 30 seconds')
+			'display'=> esc_html( __('Once Every 30 seconds') )
 		);
 		return $schedules;
 	}
@@ -198,8 +198,8 @@ class LACONN_Course extends LACONN_Main {
 		$filteredcourses = $this->filter_manual_courses( $response['courses'] );
 		foreach ( $filteredcourses as $id => $course) {
 			if ($course->id == 1) continue;
-			$check = '<input type="checkbox" name="import_course" value="'.$course->id.'"/>';
-			$course->visible = ($course->visible) ? __('Visible', LAC_TEXTDOMAIN) : __('Hidden', LAC_TEXTDOMAIN);
+			$check = '<input type="checkbox" name="import_course" value="'.esc_attr($course->id).'"/>';
+			$course->visible = ($course->visible) ? esc_html( __('Visible', LAC_TEXTDOMAIN) ) : esc_html( __('Hidden', LAC_TEXTDOMAIN) );
 			$courses[] = ['select' => ''] + array_intersect_key((array) $course, array_flip($fields));
 		}
 		// print_r($courses);
@@ -380,12 +380,12 @@ class LACONN_Course extends LACONN_Main {
 
 			return array(
 				'error'         => $error ? false : true,
-				'message'       => ($error) ? __( 'Some courses not successfully imported', LAC_TEXTDOMAIN ) : __( 'Courses imported successfully', LAC_TEXTDOMAIN ),
+				'message'       => ($error) ? esc_html( __( 'Some courses not successfully imported', LAC_TEXTDOMAIN ) ) : __( 'Courses imported successfully', LAC_TEXTDOMAIN ),
 				'response_body' => $response_body
 			);
 		}
 
-		return array('error' => true, 'message' => __('Courses Not Found On Connected Site', LAC_TEXTDOMAIN) );
+		return array('error' => true, 'message' => esc_html( __('Courses Not Found On Connected Site', LAC_TEXTDOMAIN) ) );
 	}
 
 	/**

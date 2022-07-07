@@ -202,7 +202,7 @@ class LACONN_User extends LACONN_Main {
 					$this->add_user_moodle_id( $user_data->ID, $moodle_user->id );
 					$LACONN->logger()->add( 'order', 'User "'.$moodle_user->username.'" (WPuserid - '. $user_data->ID.') created in moodle and synced with WP');
 
-					$this->set_admin_notices( 'success', __('User created successfully on LMS', 'lmsace-connect') );
+					$this->set_admin_notices( 'success', esc_html( __('User created successfully on LMS', 'lmsace-connect') ));
 
 					$md_user_id = $moodle_user->id;
 
@@ -211,7 +211,7 @@ class LACONN_User extends LACONN_Main {
 				return $md_user_id;
 			}
 		}
-		$this->set_admin_notices( 'error', __( "Oops! User can't created on LMS for this order. <br> %s", 'lmsace-connect' ), $moodle_users );
+		$this->set_admin_notices( 'error', esc_html( __( "Oops! User can't created on LMS for this order. <br> %s", 'lmsace-connect' ) ), $moodle_users );
 
 		return false;
 	}
@@ -333,7 +333,7 @@ class LACONN_User extends LACONN_Main {
 		$guest_orders = wc_get_orders(
 			array(
 				'meta_key' => '_billing_email',
-				'meta_value' => ($customer->get_email()) ? $customer->get_email() : $customer->get_billing_email(),
+				'meta_value' => ($customer->get_email()) ? sanitize_email( $customer->get_email() ) : sanitize_email( $customer->get_billing_email() ),
 				'numberposts' => -1
 			)
 		);

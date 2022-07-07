@@ -42,17 +42,17 @@ class LACONN_Main {
 	 */
 	public function __construct() {
 
-		$this->dirroot = ABSPATH . 'wp-content/plugins/lmsace-connect';
+		$this->dirroot = dirname( LAC_PLUGIN_FILE );
 
-		$this->wwwroot = plugins_url().'/lmsace-connect/';
+		$this->wwwroot = plugin_dir_url(__DIR__);
 
 		$options = get_option( 'lac_connection_settings' );
 
 		$generaloptions = get_option( 'lac_general_settings' );
 
-		$this->options = $options;
+		$this->options =  (is_array($options)) ? $options : [];
 		if (is_array($generaloptions)) {
-			$this->options = array_merge($options, $generaloptions);
+			$this->options = array_merge($this->options, $generaloptions);
 		}
 
 		$this->site_url = isset($this->options['site_url']) ? $this->options['site_url'] : '';
@@ -177,7 +177,7 @@ class LACONN_Main {
 			$_SESSION['lac_admin_flash'] = array();
 		}
 
-		$_SESSION['lac_admin_flash'][] = array( 'type' => $type, 'message' => $message);
+		$_SESSION['lac_admin_flash'][] = array( 'type' => $type, 'message' => sanitize_text_field( $message) );
 	}
 
 	/**
