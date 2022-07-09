@@ -151,7 +151,7 @@ class LACONN_Admin extends LACONN_Main {
 		$result = ($result) ? $result : array('error' => true, 'msg' => 'Error on sending response'  );
 
 		// Result the result to ajax call.
-		echo json_encode($result);
+		echo esc_html( json_encode($result) );
 
 		die(); // Exit the ajax script.
 	}
@@ -291,9 +291,9 @@ class LACONN_Admin extends LACONN_Main {
 	    echo '</h2>';
 
 		echo '<div class="tab-content">';
-		$tabcontent = ($content) ? $content.'_admin_tabcontent' : 'sitedetails_admin_tabcontent';
+		$tabcontent = ($content) ? esc_html( $content.'_admin_tabcontent' ) : 'sitedetails_admin_tabcontent';
 		if (method_exists($this,  $tabcontent)) {
-			echo $this->$tabcontent();
+			$this->$tabcontent();
 		}
 		echo '</div>';
 	}
@@ -344,7 +344,7 @@ class LACONN_Admin extends LACONN_Main {
 			<div class="import-courses">
 				<h2> <?php echo esc_html( __('Selective courses import', LAC_TEXTDOMAIN) ); ?> </h2>
 				<p> <?php echo esc_html( __('Select the courses in the table and click the button "Start import courses" in the bottom to start the courses import ', LAC_TEXTDOMAIN) ); ?> </p>
-				<p> <?php echo sprintf( esc_html( __('If you try to import more than %s courses in single import, LMSACE Connect will import the courses in background.', LAC_TEXTDOMAIN) ), LACONN_IMPORT_LIMIT); ?> </p>
+				<p> <?php echo esc_html( sprintf(  __('If you try to import more than %s courses in single import, LMSACE Connect will import the courses in background.', LAC_TEXTDOMAIN), LACONN_IMPORT_LIMIT) ); ?> </p>
 				<?php $this->import_courses_list(); ?>
 			</div>
 		 	<form method="post" action="options.php">
@@ -524,7 +524,7 @@ class LACONN_Admin extends LACONN_Main {
 	 * @return void
 	 */
 	public function section_import_settings() {
-		echo 'Select any of the options to import the courses as product.';
+		echo esc_html('Select any of the options to import the courses as product.');
 	}
 
 	/**
@@ -533,7 +533,7 @@ class LACONN_Admin extends LACONN_Main {
 	 * @return void
 	 */
 	public function section_connection_settings() {
-		echo 'Details to connect your Moodle LMS site with WooCommerce using webservice.';
+		echo esc_html('Details to connect your Moodle LMS site with WooCommerce using webservice.');
 	}
 
 	/**
@@ -576,7 +576,7 @@ class LACONN_Admin extends LACONN_Main {
 	?>
 		<p class="test-connection">
 			<input type="button" class="button secondary" id="test_connection"  value="<?php echo esc_html( __('Connect', 'lmsace-connect')); ?>" >
-			<span class="result"> <?php echo isset($connection) ? $connection : ''; ?> </span>
+			<span class="result"> <?php echo isset($connection) ? wp_kses($connection, 'span') : ''; ?> </span>
 		</p>
 	<?php
 	}
@@ -590,10 +590,10 @@ class LACONN_Admin extends LACONN_Main {
 		$options = get_option( 'lac_general_settings' );
 		?>
 		<select name='lac_general_settings[refund_suspend]' class="form" >
-			<option value="<?php echo LACONN_SUSPEND; ?>" <?php echo (isset($options['refund_suspend']) && $options['refund_suspend'] == LACONN_SUSPEND)  ? 'selected':'';?> >
+			<option value="<?php echo esc_attr(LACONN_SUSPEND); ?>" <?php echo (isset($options['refund_suspend']) && $options['refund_suspend'] == LACONN_SUSPEND)  ? esc_html('selected') : '';?> >
 				<?php echo  esc_html( __('Suspend', LAC_TEXTDOMAIN) ); ?>
 			</option>
-			<option value="<?php echo LACONN_UNENROL; ?>" <?php echo (isset($options['refund_suspend']) && $options['refund_suspend'] == LACONN_UNENROL)  ? 'selected':'';?> >
+			<option value="<?php echo esc_attr(LACONN_UNENROL); ?>" <?php echo ( isset($options['refund_suspend']) && $options['refund_suspend'] == LACONN_UNENROL)  ? esc_attr('selected') : '';?> >
 				<?php echo  esc_html( __('Unenrol', LAC_TEXTDOMAIN) ); ?>
 			</option>
 		<?php
@@ -623,7 +623,7 @@ class LACONN_Admin extends LACONN_Main {
 			<?php foreach (array_reverse($roles) as $role) :
 				if (isset($role->name)) {
 				?>
-				<option value="<?php echo esc_attr( $role->id );?>" <?php echo (isset($options['student_role']) && ($role->id == $options['student_role']) ) ? 'selected="selected"' : ''; ?> > <?php echo esc_html( $role->name ); ?></option>;
+				<option value="<?php echo esc_attr( $role->id );?>" <?php echo (isset($options['student_role']) && ($role->id == $options['student_role']) ) ? esc_attr('selected="selected"') : ''; ?> > <?php echo esc_html( $role->name ); ?></option>;
 			<?php  }
 			endforeach; ?>
 		</select>

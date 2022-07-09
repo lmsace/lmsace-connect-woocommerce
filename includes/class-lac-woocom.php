@@ -125,7 +125,7 @@ class LACONN_Woocom extends LACONN_Main {
 			$result = $this->process_order_completed( sanitize_text_field( $_POST['order_id'] ) );
 		}
 
-		echo json_encode(['error' => !$result ]);
+		echo esc_html( json_encode(['error' => !$result ]) );
 		die();
 	}
 
@@ -135,7 +135,7 @@ class LACONN_Woocom extends LACONN_Main {
 		if ($checkout == 'yes') {
 			?>
 		    <div class="notice notice-error is-dismissible lmsace-notice">
-				<h4> <?php echo 'LMSACE Connect'; ?> </h4>
+				<h4> <?php echo esc_html('LMSACE Connect'); ?> </h4>
 		        <p><?php esc_html_e( 'Disable the guest checkout on woocommerce..', 'lmsace-connect' ); ?></p>
 		    </div>
 		    <?php
@@ -448,7 +448,7 @@ class LACONN_Woocom extends LACONN_Main {
 				$list .= '</div>';
 			}
 		}
-		echo $list;
+		echo wp_kses($list, ['p', 'a', 'div']);
 	}
 
 	/**
