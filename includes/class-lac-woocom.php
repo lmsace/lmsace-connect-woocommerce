@@ -448,7 +448,7 @@ class LACONN_Woocom extends LACONN_Main {
 				$list .= '</div>';
 			}
 		}
-		echo wp_kses($list, ['p', 'a', 'div']);
+		echo wp_kses($list, $LACONN->allowed_tags());
 	}
 
 	/**

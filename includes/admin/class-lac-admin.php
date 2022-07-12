@@ -576,7 +576,7 @@ class LACONN_Admin extends LACONN_Main {
 	?>
 		<p class="test-connection">
 			<input type="button" class="button secondary" id="test_connection"  value="<?php echo esc_html( __('Connect', 'lmsace-connect')); ?>" >
-			<span class="result"> <?php echo isset($connection) ? wp_kses($connection, 'span') : ''; ?> </span>
+			<span class="result"> <?php echo isset($connection) ? wp_kses($connection, [ 'span'=> [] ] ) : ''; ?> </span>
 		</p>
 	<?php
 	}

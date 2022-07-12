@@ -413,6 +413,38 @@ class LACONN {
 	}
 
 	/**
+	 * Allowed html tags to kses.
+	 *
+	 * @return array
+	 */
+	public function allowed_tags() {
+		return [
+			'a'       => array(
+				'href'   => array(),
+				'title'  => array(),
+				'target' => array(),
+			),
+			'em'      => array(),
+			'div'     => array(),
+			'p'       => array(),
+			'ul'      => array(),
+			'ol'      => array(),
+			'li'      => array(),
+			'h1'      => array(),
+			'h2'      => array(),
+			'h3'      => array(),
+			'h4'      => array(),
+			'h5'      => array(),
+			'h6'      => array(),
+			'img'     => array(
+				'src'   => array(),
+				'class' => array(),
+				'alt'   => array(),
+			),
+		];
+	}
+
+	/**
 	 * Moodle lms web service functions list.
 	 *
 	 * @param string $key service keyword.
