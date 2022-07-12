@@ -143,3 +143,4 @@ LMSACE DEV TEAM https://lmsace.com
 ### Review
 
 You feel LMSACE Connect helps you to sell courses easier. Give a review and rating on wordpress.org. We are looking for your comments.
+

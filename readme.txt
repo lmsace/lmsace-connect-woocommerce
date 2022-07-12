@@ -1,6 +1,6 @@
 === LMSACE Connect - WooCommerce Moodle™ LMS Integration ===
 Contributors: lmsace
-Tags: LACONN, woocommerce-moodle-integration, moodle-woocommerce-integration, moodle, woocommerce, lms, moodle+woocommerce, course, course-product, course-purchase, sell-course, buy-course, sell-moodle-course
+Tags: LACONN, woocommerce-moodle-integration, moodle-woocommerce-integration, moodle, woocommerce, LMS, moodle+woocommerce, course, course-product, course-purchase, sell-course, buy-course, sell-moodle-course
 Requires at least: 4.6
 Tested up to: 6.0
 Requires PHP: 5.6
@@ -8,104 +8,115 @@ Stable tag: 1.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-LMSACE Connect plugin connects the popular Moodle LMS with woocommerce. LMSACE Connect will help the course creators to sell their courses on WordPress.
+LMSACE Connect plugin connects the popular Moodle™ LMS with woocommerce. LMSACE Connect will help the course creators to sell their courses on WordPress.
 
 == Description ==
 
-LMSACE Connect will connects the popular Moodle LMS with woocommerce. LMSACE Connect will help the course creators to sell their courses on WordPress.
+This plugin is an extension of WooCommerce which allows you to sell your Moodle™ LMS courses with WooCommerce shopping cart. Simply assign Moodle™ course(s) to a WooCommerce product. When a student purchases the product in Woocommerce, they will be automatically enrolled into the associated course(s) in Moodle™ LMS.
 
-Using LMSACE Connect users link their Moodle courses as woocommerce products in WP. Once the customer purchases the course-linked product and the order status is updated to complete, then the customer will be created in Moodle LMS and enrolled in the linked course as a selected role.
+**Plugin Features**
 
-Also, customer can access their purchased course products on the My-Courses page which is added in the My-Accounts section.
+- Seamlessly integrates WooCommerce with Moodle™ LMS
+- Import courses from Moodle™ to the Woocommerce store.
+- Select the Moodle™ course(s) you want to associate with the product when you create a product in WooCommerce.
+- Choose any payment gateway offered by Woocommerce and use it to accept payment for your Moodle™ LMS courses.
+- After a successful product purchase in Woocommerce, the integration will auto-enroll the customer into the Moodle™ course(s) so that they can begin taking the course.
+- Removes users from Moodle™ courses when refunded or cancelling a Woocommerce order.
 
-Sell course in Wordpress Using LMSACE Connect:
+**Benefits of integrating Moodle™ LMS with Woocommerce Store**
 
-1. Sell your course in Multiple WordPress.
-2. Creates woocommerce customer in Moodle LMS.
-3. Auto enrol the user into Moodle LMS Course.
-4. Suspend user / Unenrol user if order refunded.
-5. Access WooCommerce great multiple payment methods.
+There are several benefits of using WooCommerce as your shopping cart solution with Moodle™. Integrating WooCommerce with Moodle™ helps in optimizing the checkout process. Let’s Readout deeper to know about the top benefits of integrating WooCommerce with Moodle™.
 
-Helpfull Adminstration Features:
+- Grow your sales by offering Coupons & Discounts for your Learners
+- Can sell physical products along with course
+- Offer multiple payment options out of 100+ payment gateways
+- Take advantage of several other WooCommerce extensions
+- Connect with Email Marketing Platforms
+- Different ways to boost marketing and sales
+- WooCommerce Integrates With Most CRM Platforms
+- Automatically enroll students after payment
+- You Can Add up-sells, order bumps, and other revenue boosters
+- [PRO] Sell multiple courses bundled
+- [PRO] Monetize online courses via offering membership subscriptions
 
-1. Import moodle courses as WooCommerce products.
-2. Create course category as product category.
-3. Save the imported courses in draft state.
-4. Sync the Moodle LMS course with existing products.
-5. Update synced course product.
+**Suggestions**
 
-Commercial features in free of cost:
+If you have any suggestions on how to improve this plugin, feel free to [contact us](https://www.lmsace.com/contact-lmsace/) and leave your comment. All opinions are welcome. We’re grateful for your support and contribution
 
-1. Sell course with WooCommerce.
-2. Selective syncronatation.
-3. Selective customer roles in Moodle LMS course.
-4. Selective refund options.
-5. Seperate page with list of purchased course products.
+**Rate Us & Review**
+
+If you love our plugin, please give us a full five-star rating so that we know that our works are valued and appreciated. This will drive and motivate us to improve our plugins with more useful features further. Tell us what you think and suggest some ways for improvement. We highly appreciate your support and love.
 
 == Installation ==
 
+**Note:** This plugin is an extension of WooCommerce, so the WooCommerce plugin must be installed and activated on your WordPress site for this plugin to work properly.
+
 = Minimum Requirements =
 
-* PHP 7.2 or greater is recommended
-* MySQL 5.6 or greater is recommended
-* WordPress 5.3 or higher
-* Moodle 3.5 or higher
-* Woocommerce 5.0 or higher
+- PHP version 5.6 or higher
+- WordPress 4.7 or higher 
+- WooCommerce 3.0 or higher
+- Moodle™ 3.7 or higher
+- Administrative access to your WordPress and Moodle™ site
 
-== Automatic installation ==
+= Automatic installation =
 
-* Goto the "Add new" section under the "Plugins" menu.
-* Search the plugin by entering the "lmsace-connect" in the search box.
-* You will found the plugin LMSACE WooCommerce Moodle in the plugins search listing.
-* Click the "**Install Now**" button.
-* Once plugin files are added to the wordpress, you can found the "**Activiate**" button.
-* By clicking the "**Activiate**" button, you can able to access the features of LACONN.
+- Go to the "Add new" section under the "Plugins" menu.
+- Search the plugin by entering the "lmsace-connect" in the search box.
+- You will find the plugin **LMSACE WooCommerce Moodle** in the plugins search listing.
+- Click the "**Install Now**" button.
+- Once plugin files are added to WordPress, you can find the "**Activate**" button.
+- By clicking the "**Activate**" button, you can able to access the features of LACONN.
 
-== Manual installation ==
+= Manual installation =
 
-1. Download the latest '**lmsace-connect**' plugin from wordpress plugins directory
-2. Login to your WordPress as site administration.
-4. Go to '*Plugins*' -> '*Add New*' -> '*Upload Plugin*', On here upload the plugin zip '**lmsace-connect.zip**'.
-5. Click the "**Instal Now**" button.
-6. You will get **success message** once the plugin installed successfully.
-7. By clicking "**Activiate**" button on success page, Plugin will activated and you will redirect to Your dashboard.
+1. Download the plugin file [lmsace-connect-woocommerce.zip](http://www.lmsace.com/plugins/downloads/lmsace-connect-woocommerce.zip)
+2. In your WordPress admin area, navigate to PLUGINS > ADD NEW
+3. Click Upload Plugin
+4. Browse for **lmsace-connect-woocommerce.zip** file you downloaded in Step 1
+5. Click Install Now
+6. Click Activate Plugin
+
+**In the same way, you have to install the [LMSACE Connect’s](https://github.com/lmsace/lmsace-connect-moodle) corresponding Moodle™ plugin too ( Manual Installation )**
 
 == Screenshots ==
 
-1. Moodle site connection details.
-2. Import courses.
-3. Import selective courses.
-4. Link existing product with course.
-5. My-courses list.
-7. Enrolment detail for the order.
+1. Moodle™ connection setup
+2. General setup
+3. Selective courses import
+4. Various import options
+5. Course as product
+6. Make existing products as course product
+7. Order enrolment status
+8. My enrolled courses
 
 == Frequently Asked Questions ==
 
-1. How to Create site connection details in moodle to connect with LACONN ?
-You need to Generate tokens in your moodle side. Please follow the instructions in readme of [LMSACE Connect Moodle](https://github.com/lmsace/lmsace_connect/README.md)
+1. How to Create site connection details in Moodle™ to connect with LMSACE Connect ?
+You need to Generate tokens on your Moodle™ site. Please follow the instructions in the readme of [LMSACE Connect Moodle](https://github.com/lmsace/lmsace-connect-moodle)
 
-2. Which course details are used in the product when import course as product ?
-From moodle course the details "Course name, course description, course image" are imported to woocommerce product.
+2. Which course details are used in the product when importing the course as a product?
+From Moodle™ course the details "Course name, course description, course image" are imported to woocommerce product.
 
-3. Can we connect multiple moodle site in one wordpress using LACONN ?
-No, For now its not available in LACONN.
+3. Can we connect multiple Moodle™ sites in one WordPress using LMSACE Connect ?
+No, For now, it's not available in LMSACE Connect.
 
-4. Where can I post bug/issues releated to the LACONN.
-You can post your issues in our [LACONN issues forum](https://lmsace.com/lac/issues).
+4. Where can I post bugs/issues related to the LMSACE Connect.
+You can post your issues in our [LMSACE Connect issues forum](https://github.com/lmsace/lmsace-connect-woocommerce/issues).
 
-5. How can I request a features for LACONN ?
-We are happy to hear any feature request for LACONN. If you feel anything really important features are missing. Post the feature in [Request Feature for LACONN](https://lmsace.com/lac/request-features)
+5. How can I request a feature for LMSACE Connect ?
+We are happy to hear any feature request for LMSACE Connect. If you feel anything really important features are missing. Post the feature in [Request Feature for LMSACE Connect](https://github.com/lmsace/lmsace-connect-woocommerce/issues)
 
-6. Can I build custom feature in LACONN through LMSACE ?
-Yes, We can build your custom features for your sites. You can post your [Custom Requirement](https://lmsace.com/lac#customrequirement) here.
+6. Can I build a custom feature in LMSACE Connect through LMSACE?
+Yes, We can build your custom features for your sites. You can post your [Custom Requirement](https://www.lmsace.com/contact-lmsace/) here.
 
 
 == Changelog ==
 
 = 1.0 =
-Inital LACONN Release Version
+Initial LMSACE Connect Release Version
 
 == Upgrade Notice ==
 
 = 1.0 =
-Initial release. No any upgrade notices
+Initial release. No upgrade notices
