@@ -55,6 +55,44 @@ You are develop custom feature for LMSACE Connect. Please create pull request an
 3. User unerollment on order cancellation.
 4. Selectable role for pariticipants.
 
+
+### Installation steps using ZIP file.
+
+> **Note:** Make sure the **Woocommerce** is correctly installed.
+
+1. Clone Project Git repository in any of your prefered location.
+
+2. Rename the folder name into '**lmsace-connect**'.
+
+3. Next login as Site administrator
+
+4. Go to '*Plugins*' -> '*Add New*' -> '*Upload Plugin*', On here upload the plugin zip '**lmsace-connect.zip**'.
+
+5. Click the "**Instal Now**" button.
+
+
+> You will get **success message** once the plugin installed successfully.
+
+
+6. By clicking "**Activate**" button on success page , Plugin will activated and you will redirect to Your dashboard.
+
+
+### Installation steps using Git.
+
+
+1. Clone **LMSACE Connect** plugin Git repository into the folder '*plugins*'.
+
+> '*Your root diroctory*' -> '*wp-content*' -> '*plugins*'.
+
+2. Rename the folder name into '**lmsace-connect**'.
+
+3. Next login as Site administrator
+
+4. Go to the '*Plugins*' -> '*Installed plugins*'. On here LMSACE Connect plugin will listed.
+
+5. Activate the plugin by clicking "**Activate**" button placed on the bottom of the plugin name, Plugin will get the success message.
+
+
 ## Steps to setup connection.
 
 > Please install the moodle side plugin and generate webservice token in your Moodle LMS.<br> Follow the steps mentioned on the readme to generate token. [https://github.com/lmsace/lmsace-connect-moodle](https://github.com/lmsace/lmsace-connect-moodle)
@@ -97,43 +135,6 @@ You are develop custom feature for LMSACE Connect. Please create pull request an
 > **LMSACE Connect** will import the courses in background using WP_Schedule if you have tried to import more than 25 courses in single time.
 
 ![Import Courses](https://www.lmsace.com/docs/lmsace-connect/images/import-course.png)
-
-
-### Installation steps using ZIP file.
-
-> **Note:** Make sure the **Woocommerce** is correctly installed.
-
-1. Clone Project Git repository in any of your prefered location.
-
-2. Rename the folder name into '**lmsace-connect**'.
-
-3. Next login as Site administrator
-
-4. Go to '*Plugins*' -> '*Add New*' -> '*Upload Plugin*', On here upload the plugin zip '**lmsace-connect.zip**'.
-
-5. Click the "**Instal Now**" button.
-
-
-> You will get **success message** once the plugin installed successfully.
-
-
-6. By clicking "**Activiate**" button on success page , Plugin will activated and you will redirect to Your dashboard.
-
-
-### Installation steps using Git.
-
-
-1. Clone **LMSACE Connect** plugin Git repository into the folder '*plugins*'.
-
-> '*Your root diroctory*' -> '*wp-content*' -> '*plugins*'.
-
-2. Rename the folder name into '**lmsace-connect**'.
-
-3. Next login as Site administrator
-
-4. Go to the '*Plugins*' -> '*Installed plugins*'. On here LMSACE Connect plugin will listed.
-
-5. Activate the plugin by clicking "**Activiate**" button placed on the bottom of the plugin name, Plugin will get the success message.
 
 
 ## Copyright
