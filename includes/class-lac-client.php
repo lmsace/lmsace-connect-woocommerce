@@ -93,13 +93,13 @@ class LACONN_Client {
 	 * @return array status of reponse, error true or false with message.
 	 */
 	public function getResponseError($response) {
-
+		global $LACONN;
 		if (isset($response['response_code'])) {
 			// Define the Not found error for the 404 error codes.
 			if ($response['response_code'] == 404) {
 				$response['response_message'] = esc_html( __(' URL Not Found, Please check your url', 'lmsace-connect'));
 			} else if ($response['response_code'] == 403) {
-				$response['response_message'] = wp_kses(__(' Forbidden. <ul> <li> Please check your webservice settings on Your LMS </li> </ul>', 'lmsace-connect'), ['ul', 'li']);
+				$response['response_message'] = wp_kses(__(' Forbidden. <ul> <li> Please check your webservice settings on Your LMS </li> </ul>', 'lmsace-connect'), $LACONN->allowed_tags());
 			}
 
 			 // Returns the request error.

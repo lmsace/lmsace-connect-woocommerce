@@ -148,10 +148,10 @@ class LACONN_Admin extends LACONN_Main {
 			}
 		}
 
-		$result = ($result) ? $result : array('error' => true, 'msg' => 'Error on sending response'  );
+		$result = ($result) ? wp_kses_post_deep($result, $LACONN->allowed_tags()) : array('error' => true, 'msg' => 'Error on sending response'  );
 
 		// Result the result to ajax call.
-		echo esc_html( json_encode($result) );
+		echo json_encode($result);
 
 		die(); // Exit the ajax script.
 	}

@@ -315,9 +315,11 @@ class LACONN {
 	 * @return bool
 	 */
 	public function is_setup_completed() {
+		global $LACONN;
+		
 		$options = $this->get_options();
 		if (!isset($options['site_url']) || empty($options['site_url'])) {
-			$this->set_admin_notices('warning', '<h4> LMSACE Connect </h4>'.sprintf( esc_html(__(' <p> <b>You need to specify a Moodle LMS domain and a Moodle LMS Access token.</b> You must <a href="%s">enter your domain and API key</a> for it to work.</p> ', 'lmsace-connect'), ['p', 'a']), 'admin.php?page=lac-admin-settings'), 'connection', true);
+			$this->set_admin_notices('warning', '<h4> LMSACE Connect </h4>'.sprintf( wp_kses( __(' <p> <b>You need to specify a Moodle LMS domain and a Moodle LMS Access token.</b> You must <a href="%s">enter your domain and API key</a> for it to work.</p> ', 'lmsace-connect'), $LACONN->allowed_tags()), 'admin.php?page=lac-admin-settings'), 'connection', true);
 		} else {
 			$request = $this->Client->request(self::services('get_user_roles'), array(), false);
 			if ($request) {
