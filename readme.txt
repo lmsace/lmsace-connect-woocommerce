@@ -63,10 +63,10 @@ If you love our plugin, please give us a full five-star rating so that we know t
 
 - Go to the "Add new" section under the "Plugins" menu.
 - Search the plugin by entering the "lmsace-connect" in the search box.
-- You will find the plugin **LMSACE Connect - WooCommerce Moodle™ LMS Integration** in the plugins search listing.
+- You will find the plugin **LMSACE WooCommerce Moodle** in the plugins search listing.
 - Click the "**Install Now**" button.
 - Once plugin files are added to WordPress, you can find the "**Activate**" button.
-- By clicking the "**Activate**" button, you can able to access the features of LMSACE Connect.
+- By clicking the "**Activate**" button, you can able to access the features of LACONN.
 
 = Manual installation =
 
@@ -78,6 +78,8 @@ If you love our plugin, please give us a full five-star rating so that we know t
 6. Click Activate Plugin
 
 **In the same way, you have to install the [LMSACE Connect’s](https://github.com/lmsace/lmsace-connect-moodle) corresponding Moodle™ plugin too ( Manual Installation )**
+
+**Please follow the steps described in the [README.MD](https://github.com/lmsace/lmsace-connect-woocommerce) to **Setup the connection** between WooCommerce and Moodle™ LMS.**
 
 == Screenshots ==
 
