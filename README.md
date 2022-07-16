@@ -103,8 +103,6 @@ You are develop custom feature for LMSACE Connect. Please create pull request an
 
 3. Enter your Moodle Site URL and Site token which you can copy from your Moodle **LMSACE Connect** "*General*" tab.
 
-> Note: Test the given details are working fine using the "**Test Connection**" button.
-
 4. Please click the '**Save Change**' button to save the details.
 
 ![Connection Setup](https://www.lmsace.com/docs/lmsace-connect/images/connection-setup.png)
