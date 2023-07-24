@@ -36,7 +36,7 @@ Plugin URI: https://woocommerce.com/
 
 ## Documenation
 
-The official documentation for LMSACE Connect can be found at [https://lmsace.com/docs/lmsace-connect](https://lmsace.com/docs/lmsace-connect).
+The official documentation for LMSACE Connect can be found at [https://github.com/lmsace/lmsace-connect-woocommerce/wiki](https://github.com/lmsace/lmsace-connect-woocommerce/wiki)
 
 ## Bugs and Problems Report.
 
