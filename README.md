@@ -59,7 +59,7 @@ You are developing a custom feature for LMSACE Connect. Please create a pull req
 
 > **Note:** Make sure the **Woocommerce** is correctly installed.
 
-1. Download the plugin file [lmsace-connect-woocommerce.zip](https://www.lmsace.com/plugins/downloads/lmsace-connect-woocommerce_v2.0.zip)
+1. Download the latest "**LMSACE Connect WooCommerce**" plugin file from the [github releases](https://github.com/lmsace/lmsace-connect-woocommerce/releases)
 
 2. Next login as Site Administrator
 

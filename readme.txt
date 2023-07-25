@@ -72,7 +72,7 @@ If you love our plugin, please give us a full five-star rating so that we know t
 
 = Manual installation =
 
-1. Download the plugin file [lmsace-connect-woocommerce.zip](https://www.lmsace.com/plugins/downloads/lmsace-connect-woocommerce.zip)
+1. Download the plugin file [lmsace-connect-woocommerce.zip](https://downloads.wordpress.org/plugin/lmsace-connect.2.0.zip)
 2. In your WordPress admin area, navigate to PLUGINS > ADD NEW
 3. Click Upload Plugin
 4. Browse for **lmsace-connect-woocommerce.zip** file you downloaded in Step 1
