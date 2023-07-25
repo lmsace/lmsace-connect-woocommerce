@@ -41,20 +41,18 @@ class LACONN_Woocom extends LACONN_Main {
 		global $LACONN;
 
 		// Observer the order status changed to completed. then create user on LMS.
-		add_action('woocommerce_order_status_completed', array($this, 'process_order_completed'), 10, 1 );
+		add_action( 'woocommerce_order_status_completed', array($this, 'process_order_completed'), 10, 1 );
 		// Unenrol the user form LMS after the order refunded.
-		add_action('woocommerce_order_status_changed', array($this, 'process_order_refund' ), 10, 2);
+		add_action( 'woocommerce_order_status_changed', array($this, 'process_order_refund' ), 10, 1);
 		// add_action('woocommerce_order_refunded', array($this, 'process_order_refund' ), 10, 2);
 
 		// Warning message to disable the guest checkout on woocommerce.
-		add_action('admin_notices', array( $this, 'warn_disable_guest_checkout' ) );
+		add_action( 'admin_notices', array( $this, 'warn_disable_guest_checkout' ) );
 		// Add user enrolment status metabox on admin backend order page.
-		add_action('add_meta_boxes', array( $this, 'add_user_enrollment_metabox' ) );
+		add_action( 'add_meta_boxes', array( $this, 'add_user_enrollment_metabox' ) );
 		// Ajax observer for create enrolment manually.
-		add_action('wp_ajax_lac_user_enrollment', array( $this, 'create_order_enrollment') );
+		add_action( 'wp_ajax_lac_user_enrollment', array( $this, 'create_order_enrollment') );
 		// Rearrange the menu order on user dashboard.
-		add_filter( 'woocommerce_account_menu_items', array( $this, 'my_account_menu_order') );
-
 		add_filter( 'woocommerce_account_menu_items', array( $this, 'my_account_menu_order') );
 
 		// Add My courses url end point with my account page.
@@ -71,6 +69,32 @@ class LACONN_Woocom extends LACONN_Main {
 		// Prevent add to cart more than one for the course products.
 		add_filter( 'woocommerce_add_to_cart_validation', array( $this, 'lac_prevent_twice_course_product' ), 10, 2 );
 
+		add_action( 'wp_enqueue_scripts',  array( $this, 'enqueue_accordion_scripts' ) );
+
+		add_action( 'wp_footer', array( $this, 'initialize_accordion_script' ) );
+
+	}
+
+	// Enqueue the necessary scripts and styles.
+	public function enqueue_accordion_scripts() {
+		wp_enqueue_script('jquery-ui-accordion');
+		wp_enqueue_style('jquery-ui-style', 'https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css');
+		wp_enqueue_style('lmsace-connect-style', $this->wwwroot . 'styles.css');
+	}
+
+	/**
+	 * Initialize the script for accordion.
+	 *
+	 * @return void
+	 */
+	function initialize_accordion_script() {
+		echo '<script type="text/javascript">
+			jQuery(document).ready(function($) {
+				$("#lmsace-connect-summary-accord").accordion({
+					collapsible: true
+				});
+			});
+		</script>';
 	}
 
 	/**
@@ -84,6 +108,7 @@ class LACONN_Woocom extends LACONN_Main {
 		$products = [];
 
 		$md_course_id = $this->get_product_moodle_id( $product_id );
+		// Product not a course linked no need to prevent.
 		if ( !$md_course_id ) {
 			return $validation;
 		}
@@ -92,7 +117,7 @@ class LACONN_Woocom extends LACONN_Main {
 			$product = $cart_item['data'];
 			$products[] = $product->get_id();
 		}
-
+		// Course Product already added to the cart.
 		if ( in_array($product_id, array_values($products)) ) {
 			return false;
 		}
@@ -121,6 +146,7 @@ class LACONN_Woocom extends LACONN_Main {
 	 * @return void
 	 */
 	public function create_order_enrollment() {
+
 		if (isset($_POST['order_id']) && !empty($_POST['order_id'])) {
 			$result = $this->process_order_completed( sanitize_text_field( $_POST['order_id'] ) );
 		}
@@ -135,7 +161,7 @@ class LACONN_Woocom extends LACONN_Main {
 		if ($checkout == 'yes') {
 			?>
 		    <div class="notice notice-error is-dismissible lmsace-notice">
-				<h4> <?php echo esc_html('LMSACE Connect'); ?> </h4>
+				<h4> <?php echo esc_html('LMSACE Connect', 'lmsace-connect'); ?> </h4>
 		        <p><?php esc_html_e( 'Disable the guest checkout on woocommerce..', 'lmsace-connect' ); ?></p>
 		    </div>
 		    <?php
@@ -179,6 +205,12 @@ class LACONN_Woocom extends LACONN_Main {
 
 				$user_id = $details['order']->get_user_id();
 
+				// Guest checkout support. if user_id is empty then use the useremail as userid.
+				if ( !$user_id ) {
+					$user_id = $details['user']->email;
+				}
+
+				// Check the order user is moodle user or already created in moodle.
 				$md_user_id = $LACONN->User->is_moodle_user( $user_id, true, $details['user'] );
 
 				if ( $md_user_id ) {
@@ -187,12 +219,11 @@ class LACONN_Woocom extends LACONN_Main {
 						// Get post id of the order item.
 						$product_id = $product->get_product_id();
 						// Get course id related to the moodle for the current item in order.
-						$md_courses = (int) $this->get_product_moodle_id($product_id);
+						$md_courses = $this->get_product_moodle_id($product_id);
 
-						if ( is_integer($md_courses) ) {
-							$md_courses = array( $md_courses );
-						}
+						$md_courses = (!is_array($md_courses)) ? array($md_courses) : $md_courses;
 
+						$metaenrols = $enrolments = [];
 						foreach ( $md_courses as $md_course_id ) {
 							// Enrol the user in the course in lms environment.
 							if ( !empty($md_course_id) ) {
@@ -201,11 +232,12 @@ class LACONN_Woocom extends LACONN_Main {
 									'userid' => $md_user_id,
 									'courseid' => $md_course_id
 								);
+
 								$metaenrols[] = array_merge($enrols, ['productid' => $product_id]);
 								$enrolments[] = $enrols;
 
 								$LACONN->logger()->add( 'order',
-								' Preparing enrolment - "'.$product_id.'" ('.json_encode($enrolments).') ');
+									' Preparing enrolment - "'.$product_id.'" ('.json_encode( $enrolments ).') ' );
 							}
 						}
 					}
@@ -215,9 +247,10 @@ class LACONN_Woocom extends LACONN_Main {
 						if ( $result != null ) {
 							$details['order']->update_meta_data( 'lac_enrolments', $metaenrols );
 							$LACONN->logger()->add( 'order', ' Updated enrolments in order meta - '.json_encode($enrolments));
-							foreach ($enrolments as $enrolment) {
-								if (isset( $enrolment['courseid'] ) )
+							foreach ( $enrolments as $enrolment ) {
+								if ( isset( $enrolment['courseid'] ) ) {
 									$LACONN->set_admin_notices( 'success', sprintf ( esc_html( __('User %1s enrolled on the courses', 'lmsace-connect') ), $details['user']->user_login ) );
+								}
 							}
 						}
 					}
@@ -230,17 +263,19 @@ class LACONN_Woocom extends LACONN_Main {
 			}
 			$t = $details['order']->save();
 		}
-
+		// exit;
 	}
 
 	/**
 	 * process_order_refund
 	 *
 	 * @param  mixed $order_id
+	 * @param string $force Force the unenrolment.
 	 * @return void
 	 */
-	public function process_order_refund( $order_id ) {
+	public function process_order_refund( $order_id, $force = false ) {
 		global $LACONN;
+
 		if (!empty($order_id)) {
 			// Get the refuned order details to unenroll the user from moodle.
 			$details = $this->get_order_details( $order_id );
@@ -251,13 +286,16 @@ class LACONN_Woocom extends LACONN_Main {
 
 			$order_enrolments = $details['order']->get_meta( 'lac_enrolments' );
 
+			$order_enrolments = apply_filters( 'lmsace_connect_order_enrolments', $order_enrolments, $details['order'] );
+
 			// User id connected with moodle.
 			$user_id = $details['order']->get_user_id();
+
 			$data = $details['order']->get_data();
 
 			$refund = isset($this->options['refund_suspend']) ? $this->options['refund_suspend'] : LACONN_SUSPEND;
 
-			if ( $data['status'] != 'completed' && $refund && !empty($order_enrolments) ) {
+			if ( ($force || $data['status'] != 'completed') && $refund && !empty($order_enrolments) ) {
 
 				$LACONN->logger()->add( 'order', ' Order refund init - orderID: '.$order_id);
 				// Enrol the user in each orderer item/course.
@@ -318,14 +356,22 @@ class LACONN_Woocom extends LACONN_Main {
 		$products = $order->get_items();
 
 		// Order User object.
-		// Order User object.
-		$user = $order->get_user() ? $order->get_user()->data : [];
+		$user = $order->get_user() ? $order->get_user()->data : new stdclass();
 
 		if (!isset($user->email) && isset($user->user_email) && !empty($user->user_email)) {
 			$user->email = $user->user_email;
 		}
+		// Adding guest user support.
+		if (!isset($user->email) || $user->email == '') {
+			// Set the billing email as user email if it's empty.
+			$user->email = $order->get_billing_email();
+			$user->ID = 'guest';
+			$user->firstname = $order->get_billing_first_name();
+			$user->lastname = $order->get_billing_last_name();
+			$user->user_login = $order->get_billing_email();
+		}
 
-		return array('order' => $order, 'products' => $products, 'user' => $user  );
+		return array( 'order' => $order, 'products' => $products, 'user' => $user );
 	}
 
 	/**
@@ -370,7 +416,7 @@ class LACONN_Woocom extends LACONN_Main {
 		   'meta_query'  => array(
 		     	array(
 		     		'key' => LACONN_MOODLE_COURSE_ID,
-		     		'value' => $courseid
+		     		'value' => serialize([$courseid])
 		     	)
 		   	)
 		);
@@ -391,6 +437,12 @@ class LACONN_Woocom extends LACONN_Main {
 		return ($imageurl) ?: $dummyimage;
 	}
 
+	/**
+	 * Fetch the list of courses linked with the product.
+	 *
+	 * @param int $product_id
+	 * @return void
+	 */
 	public function get_product_moodle_id( $product_id ) {
 		return get_post_meta($product_id, LACONN_MOODLE_COURSE_ID, true);
 	}

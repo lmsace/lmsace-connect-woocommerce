@@ -78,11 +78,17 @@ class LACONN_Admin_request extends LACONN_Main {
 			/* Import Categories */
 			$assign_category = in_array( 'course_category', $import_option) ? true : false;
 
+			// $others = in_array( 'other', $import_option) ? $import_option['other'] : [];
+
 			$selectedcourses = explode(',', $courses);
+
+			$service = 'get_courses_by_field';
+
+			$service = apply_filters('lmsace_connect_course_import_service', $service, $import_option);
 
 			if ( !empty($courses) && count($selectedcourses) < LACONN_IMPORT_LIMIT) {
 				/* Retrive Courses from Moodle  */
-				$courses = (array) $this->client->request(LACONN::services('get_courses_by_field'),
+				$courses = (array) $this->client->request(LACONN::services($service),
 					array(
 						'field' => 'ids',
 						'value' => $courses
@@ -93,18 +99,19 @@ class LACONN_Admin_request extends LACONN_Main {
 					$courses = $courses['courses'];
 
 					// Create imported courses as product on WP.
-					$status = $this->courseSync->create_courses( $courses, $assign_category, $make_draft, $update_existing );
+					$status = $this->courseSync->create_courses( $courses, $assign_category, $make_draft, $update_existing, $import_option );
 					if (isset($status['response_body'])) {
 						$counts = $status['response_body'];
 						$count = (count($counts['created'])) ? count($counts['created']).' courses created, ' : ' No courses created, ';
 						$count .= (count($counts['updated'])) ? count($counts['updated']).' courses updated, ' : ' No courses updated, ';
-						$count .= (count($counts['existing'])) ? count($counts['existing']).' courses exists. ' : '';					}
+						$count .= (count($counts['existing'])) ? count($counts['existing']).' courses exists. ' : '';					
+					}
 
 					$result = array('error' => false, 'message' => '<span class="connection-success">'.
 						sprintf( esc_html( __( 'Courses import completed - %s ', LAC_TEXTDOMAIN ) ), $count).'</span>'
 					);
 				} else {
-					$result = array('error' => true, 'message' => '<span class="connection-error">'. esc_html(__( 'Courses not found on connected LMS site', LAC_TEXTDOMAIN ))).'</span>';
+					$result = array('error' => true, 'message' => '<span class="connection-error">'. esc_html(__( 'Courses not found on connected LMS site', LAC_TEXTDOMAIN )).'</span>');
 				}
 
 			} else {
@@ -112,7 +119,7 @@ class LACONN_Admin_request extends LACONN_Main {
 				$count = $this->client->request( LACONN::services('get_courses_count'), array());
 				if (!empty($count)) {
 					$split = array_chunk($selectedcourses, LACONN_IMPORT_LIMIT);
-					$this->courseSync->set_schedule_course_import( $split, $assign_category, $make_draft, $update_existing );
+					$this->courseSync->set_schedule_course_import( $split, $assign_category, $make_draft, $update_existing, $import_option );
 					$message = esc_html( __('Courses import process running in background. Please staty logged in.', LAC_TEXTDOMAIN));
 					$result = array('error' => false, 'message' => '<span class="connection-info">'.$message.'</span>' );
 					$LACONN->set_admin_notices('info', $message, 'import', true);

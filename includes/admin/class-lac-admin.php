@@ -41,11 +41,13 @@ class LACONN_Admin extends LACONN_Main {
 	 * @return array
 	 */
 	public function get_tabs() {
-		return [
+		$tabs = [
 			'lac-connection-options' => esc_html( __( 'Connection Setup', 'lmsace-connect' )),
 			'lac-general-options' => esc_html( __('General Setup', 'lmsace-connect' )),
 			'lac-import-courses' => esc_html( __('Import Courses', 'lmsace-connect' )),
 		];
+
+		return apply_filters( 'lmsace_connect_get_setting_tabs', $tabs);
 	}
 
 	/**
@@ -66,9 +68,12 @@ class LACONN_Admin extends LACONN_Main {
 		// Add course selector select box in LAConn tab on product page.
 		add_filter( 'woocommerce_product_data_panels', 'lac_moodle_courses_product_tab_content' );
 		// Save course id for the prodct when the product Updated.
-		add_action( 'woocommerce_process_product_meta_simple', 'lac_save_moodlecourse_option_fields'  );
-		add_action( 'woocommerce_process_product_meta_variable', 'lac_save_moodlecourse_option_fields'  );
+		add_action( 'woocommerce_process_product_meta_simple', array( $this, 'lac_save_moodlecourse_option_fields' ) );
+		add_action( 'woocommerce_process_product_meta_variable', array( $this, 'lac_save_moodlecourse_option_fields' ) );
 
+		// Import courses and its course module details.
+		add_filter( 'lmsace_connect_course_import_service', array($this, 'course_import_service'), 1, 2 );
+		add_filter( 'lmsace_connect_before_course_update', array($this, 'before_course_update') );
 	}
 
 	/**
@@ -186,12 +191,17 @@ class LACONN_Admin extends LACONN_Main {
 		global $LACONN;
 		$doc = new DOMDocument();
 		if (empty($course->summary)) {
-			return sanitize_textarea_field( $course->summary );
+			// return sanitize_textarea_field( $course->summary );
+			return wp_kses_post_deep( $course->summary, $LACONN->allowed_tags());
 		}
 		@$doc->loadHTML($course->summary);
 		$tags = $doc->getElementsByTagName('img');
 		$images = $src = [];
 		foreach ($tags as $tag) {
+			$class = $tag->getAttribute('class');
+			if ($class == 'modicon') {
+				continue;
+			}
 			$url = $tag->getAttribute('src');
 			$src[] = $url; // Used on replace.
 			$url .= '?token='.$this->site_token;
@@ -200,9 +210,9 @@ class LACONN_Admin extends LACONN_Main {
 		if (!empty($images)) {
 			$updated = $LACONN->Course->upload_product_image($post_id, $images, 'course_summary');
 			$summary = strtr($course->summary, array_combine($src, $updated));
-			return sanitize_textarea_field( $summary );
+			return wp_kses_post_deep( $summary, $LACONN->allowed_tags() );
 		}
-		return sanitize_textarea_field( $course->summary );
+		return wp_kses_post_deep( $course->summary, $LACONN->allowed_tags() );
 	}
 
 	/**
@@ -248,6 +258,8 @@ class LACONN_Admin extends LACONN_Main {
 			array( $this, 'admin_setting_importcourses')
 		);
 
+		do_action( 'lmsace_connect_admin_setting_menu' );
+
 		remove_submenu_page('lac-admin-settings', 'lac-admin-settings' );
 
 	    // Call register settings function.
@@ -256,14 +268,28 @@ class LACONN_Admin extends LACONN_Main {
 
 	}
 
+	/**
+	 * Connection setup admin settings section.
+	 *
+	 * @return void
+	 */
 	public function admin_setting_connectionsetup() {
 		$this->admin_setting_tabs( 'lac-connection-options', 'sitedetails' );
 	}
-
+	/**
+	 * Init the general settings setup section.
+	 *
+	 * @return void
+	 */
 	public function admin_setting_generaloptions() {
 		$this->admin_setting_tabs( 'lac-general-options', 'generaloptions' );
 	}
 
+	/**
+	 * Admin settings defined to import courses.
+	 *
+	 * @return void
+	 */
 	public function admin_setting_importcourses() {
 		$this->admin_setting_tabs( 'lac-import-courses', 'importcourses' );
 	}
@@ -318,13 +344,21 @@ class LACONN_Admin extends LACONN_Main {
 	<?php
 	}
 
+	/**
+	 * General options admin tab content.
+	 *
+	 * @return void
+	 */
 	public function generaloptions_admin_tabcontent() {
 		settings_errors();
 	?>
 		<div class="wrap">
 		 	<form method="post" action="options.php">
 			    <?php settings_fields( 'lac-general-settings' ); ?>
-			    <?php do_settings_sections( 'lac-general-settings' ); ?>
+			    <?php
+				do_settings_sections( 'lac-general-settings' );
+				do_action( 'lmsace_connect_general_section_settings' );
+				?>
 		    	<?php submit_button(); ?>
 			</form>
 		 </div>
@@ -451,6 +485,7 @@ class LACONN_Admin extends LACONN_Main {
 	        'lac-site-settings',
 	        'connection_settings_section'
 	    );
+
 		//  Moodle token to connect.
 	    add_settings_field(
 	        'site_token',
@@ -500,6 +535,8 @@ class LACONN_Admin extends LACONN_Main {
 	        'lac-general-settings',
 	        'lac_general_options'
 	    );
+
+		do_action( 'lmsace_connect_register_setting_fields' );
 
 		LACONN()->is_setup_completed();
 	}
@@ -686,22 +723,90 @@ class LACONN_Admin extends LACONN_Main {
 		$options = get_option( 'lac_import_settings' );
     ?>
 	    <p>
-	    	<input type="checkbox" name="lac_import_settings[import_options][]" value="course" checked disabled>
-	    	<?php echo esc_html( __('Import selected courses as WooCommerce product.') );  ?>
+	    	<input id="import_course" type="checkbox" name="lac_import_settings[import_options][]" value="course" checked disabled>
+	    	<label for="import_course"> <?php echo esc_html( __('Import selected courses as WooCommerce product.') );  ?> </label>
 		</p>
 		<p>
-	    	<input type="checkbox" name="lac_import_settings[import_options][]" value="course_draft" >
-	    	<?php echo esc_html( __('Import selected courses as product and save as draft.') ); ?>
+	    	<input id="import_course_draft" type="checkbox" name="lac_import_settings[import_options][]" value="course_draft" >
+	    	<label for="import_course_draft"> <?php echo esc_html( __('Import selected courses as product and save as draft.') ); ?> </label>
 	    </p>
 		<p>
-	    	<input type="checkbox" name="lac_import_settings[import_options][]" value="update_existing" >
-	    	<?php echo esc_html( __('Update the existing linked product data with current course content.') ); ?>
+	    	<input id="import_update_existing" type="checkbox" name="lac_import_settings[import_options][]" value="update_existing" >
+	    	<label for="import_update_existing"> <?php echo esc_html( __('Update the existing linked product data with current course content.') ); ?> </label>
 	    </p>
 	    <p>
-	    	<input type="checkbox" name="lac_import_settings[import_options][]" value="course_category" >
-	    	<?php echo esc_html( __('Import selected courses with its category.') ); ?>
+	    	<input id="import_course_category" type="checkbox" name="lac_import_settings[import_options][]" value="course_category" >
+	    	<label for="import_course_category"> <?php echo esc_html( __('Import selected courses with its category.') ); ?> </label>
+		</p>
+		<p>
+	    	<input id="import_course_details" type="checkbox" name="lac_import_settings[import_options][]" value="course_details" >
+	    	<label for="import_course_details"> <?php echo esc_html( __('Import selected courses with its details summary.') ); ?> </label>
 		</p>
     <?php
+		do_action( 'lmsace_connect_import_settings_list', $options );
+	}
+
+	/**
+	 * Save the custom fields.
+	 */
+	public function lac_save_moodlecourse_option_fields( $post_id ) {
+
+		if ( isset( $_POST[LACONN_MOODLE_COURSE_ID] ) ) :
+			$courses = wp_kses_post_deep(array_values($_POST[LACONN_MOODLE_COURSE_ID]));
+			// Convert the type of course id into integer.
+			// Typecast issue with searialize.
+			array_walk($courses, function(&$value) {
+				$value = (int) $value;
+			});
+			update_post_meta( $post_id, LACONN_MOODLE_COURSE_ID, $courses );
+		endif;
+	}
+
+	/**
+	 * Course import service.
+	 *
+	 * @param [type] $servicename
+	 * @param [type] $options
+	 * @return void
+	 */
+	public function course_import_service( $servicename, $options ) {
+		if (in_array('course_details', $options)) {
+			return 'get_courses_detail_by_field';
+		}
+		return $servicename;
+	}
+
+	/**
+	 * Before course update, added the course content details with course summary.
+	 *
+	 * @param [type] $courses
+	 * @return void
+	 */
+	public function before_course_update($courses) {
+		foreach ($courses as $key => $course) {
+			$courses[$key]->summary = $course->summary . $this->render_course_details($course);
+		}
+
+		return $courses;
+	}
+
+	/**
+	 * Render the course details. Look at the coursedata.php file in templates folder.
+	 *
+	 * @param stdclass $course
+	 * @return void
+	 */
+	public function render_course_details($course) {
+		if ( isset($course->details) && !empty($course->details) ) {
+			$details = (object) json_decode($course->details);
+			$sections = (object) (property_exists($details, 'sections') ? $details->sections : []);
+			ob_start();
+			require_once( dirname( LAC_PLUGIN_FILE ) . '/templates/coursedata.php' );
+			$data = ob_get_contents();
+            ob_clean();
+			return $data;
+		}
+		return null;
 	}
 }
 

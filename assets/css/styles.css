@@ -54,7 +54,7 @@
     margin-right: 0;
 }
  #wpbody-content .lmsace-connect-admin-config .tab-content form {
-    
+
 }
 #wpbody-content .lmsace-connect-admin-config .dataTables_wrapper table.dataTable {
     border: 1px solid #c3c4c7;
@@ -105,8 +105,8 @@
 
 
 #wpbody-content .lmsace-connect-admin-config .select2-container--default .select2-selection--multiple .select2-selection__choice {
-    padding: 0.25em 0.4em;    
-    font-weight: 700;    
+    padding: 0.25em 0.4em;
+    font-weight: 700;
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;
@@ -118,7 +118,7 @@
 
 #wpbody-content .lmsace-connect-admin-config tr:nth-child(4) th {
     /* display: none; */
-    font-size: 1.3em;
+    /* font-size: 1.3em; */
 }
 
 #wpbody-content .lmsace-connect-admin-config .select2-container--default.select2-container--focus .select2-selection--multiple {

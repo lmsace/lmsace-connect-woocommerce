@@ -40,7 +40,13 @@ class LACONN_Course extends LACONN_Main {
 	public function lac_register_actions() {
 		add_filter( 'cron_schedules', array( $this, 'lac_cron_definer' ) );
 		add_action( 'lac_import_courses_action', array($this, 'lac_import_courses') );
+		add_shortcode( 'lmsace_connect_summary', array($this, 'summary_shortcode'));
 	}
+
+	public function summary_shortcode( $atts, $content ) {
+		return $content;
+	}
+
 	/**
 	 * Returns an instance of the plugin object
 	 *
@@ -333,10 +339,12 @@ class LACONN_Course extends LACONN_Main {
 	 * @param bool $update_existing Update the existing linked product.
 	 * @return array result of connection
 	 */
-	public function create_courses($courseslist = array(), $assign_category=false, $make_draft=false, $update_existing=false) {
+	public function create_courses($courseslist = array(), $assign_category=false, $make_draft=false, $update_existing=false, $options=[]) {
 		global $LACONN;
 		$this->get_user();
 		if ( !empty($courseslist) ) {
+
+			$courseslist = apply_filters( 'lmsace_connect_before_course_update', $courseslist);
 
 			$successUpdate = $errorUpdate = $successCourses = $errorCourses = $errorExist = array();
 			foreach ( $courseslist as $key => $course ) {
@@ -344,7 +352,8 @@ class LACONN_Course extends LACONN_Main {
 					if ($posts = $LACONN->Woocom->get_product_from_course_id($course->id)) {
 						if ($update_existing) {
 							foreach ($posts as $post) {
-								if ($this->update_course($post, $course, $assign_category, $make_draft) ) {
+								// Update existing courses.
+								if ($this->update_course($post, $course, $assign_category, $make_draft, $options) ) {
 									$successUpdate[$course->id] = $course->fullname;
 									LACONN()->logger()->add('course', 'Course product updated - '.$course->fullname.'');
 								} else {
@@ -357,8 +366,8 @@ class LACONN_Course extends LACONN_Main {
 
 					} else {
 						LACONN()->logger()->add('course', 'Assign-category - '.$assign_category);
-
-						if ( $this->create_course($course, $assign_category, $make_draft) ) {
+						// Create courses.
+						if ( $this->create_course($course, $assign_category, $make_draft, $options) ) {
 							$successCourses[$course->id] = $course->fullname;
 							LACONN()->logger()->add('course', 'Course created as product - '.$course->fullname.'');
 						} else {
@@ -396,7 +405,7 @@ class LACONN_Course extends LACONN_Main {
 	 * @param bool $make_draft
 	 * @return bool
 	 */
-	public function create_course($course, $assign_category=false, $make_draft=false) {
+	public function create_course($course, $assign_category=false, $make_draft=false, $options=[]) {
 		global $LACONN;
 
 		$post = array(
@@ -411,6 +420,7 @@ class LACONN_Course extends LACONN_Main {
 			// Update the course summary.
 			$summary = $this->admin->replace_coursesummary_images($post_id, $course);
 			$postcontent = [ 'ID' => $post_id, 'post_content' => $summary ];
+
 			wp_update_post( $postcontent, true );
 
 			wp_set_object_terms( $post_id, 'simple', 'product_type' );
@@ -469,7 +479,7 @@ class LACONN_Course extends LACONN_Main {
 	 * @param bool $make_draft
 	 * @return void
 	 */
-	public function update_course($post_id, $course, $assign_category=false, $make_draft=false) {
+	public function update_course($post_id, $course, $assign_category=false, $make_draft=false, $options=[]) {
 		global $LACONN;
 		$post = array(
 			'ID' => $post_id,
@@ -481,9 +491,20 @@ class LACONN_Course extends LACONN_Main {
 		);
 
 		$summary = $this->admin->replace_coursesummary_images($post_id, $course);
+		$summary = '[lmsace_connect_summary]'.$summary.'[/lmsace_connect_summary]';
+
+
+		$currentpost = get_post($post_id);
+		if ($currentpost != '') {
+			$postcontent = $currentpost->post_content;
+			if (has_shortcode($postcontent, 'lmsace_connect_summary')) {
+				$pattern = get_shortcode_regex();
+				$summary = preg_replace('/'. $pattern .'/s', $summary, $postcontent);
+			}
+		}
 		$post['post_content'] = $summary;
 
-		// update course details in product post.
+        // update course details in product post.
 		$postid = wp_update_post($post, true);
 
 		if ( is_wp_error($post_id) ) {
@@ -545,11 +566,12 @@ class LACONN_Course extends LACONN_Main {
 	    update_post_meta( $post_id, '_product_attributes',  array('term_id' => $course->categoryid) );
 	    update_post_meta( $post_id, '_sku', $course->shortname );
 		update_post_meta( $post_id, '_visibility', ($course->visible) ? 'visible' : 'hide' );
-
+		// LAConnect support multiple courses link with single product.
+		$courses = array( $course->id );
 		if ( ! metadata_exists('post', $post_id, LACONN_MOODLE_COURSE_ID) ) {
-	    	add_post_meta( $post_id, LACONN_MOODLE_COURSE_ID, $course->id);
+	    	add_post_meta( $post_id, LACONN_MOODLE_COURSE_ID, $courses);
 		} else {
-	    	update_post_meta( $post_id, LACONN_MOODLE_COURSE_ID, $course->id);
+	    	update_post_meta( $post_id, LACONN_MOODLE_COURSE_ID, $courses);
 		}
 
 	    update_post_meta( $post_id, '_stock_status', 'instock');

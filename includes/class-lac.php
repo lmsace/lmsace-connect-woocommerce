@@ -37,6 +37,12 @@ class LACONN {
 	 */
 	public $site_url;
 
+	public $handlers;
+
+	public $options;
+
+	public const KEY = 'LACONN_';
+
 	/**
 	 * Returns an instance of the plugin object
 	 *
@@ -56,9 +62,12 @@ class LACONN {
 	 * @param boolean $helpers [description]
 	 */
 	public function __construct() {
-
 		$this->define();
+		$this->setup_config();
+		$this->includes();
+	}
 
+	public function setup_config() {
 		$this->dirroot = dirname( LAC_PLUGIN_FILE );
 		$this->wwwroot = plugin_dir_url(__DIR__);
 
@@ -73,8 +82,6 @@ class LACONN {
 		if ( $this->site_url != '' && strrev($this->site_url)[0] !== '/' ) {
 			$this->site_url .= '/';
 		}
-
-		$this->includes();
 	}
 
 	/**
@@ -82,12 +89,13 @@ class LACONN {
 	 *
 	 * @return void
 	 */
-	private function define() {
+	protected function define() {
+
 		$upload_dir = wp_upload_dir( null, false );
 		$params = [
 			'LAC_TEXTDOMAIN'           => 'lmsace-connect',
 			'NONCEKEY'             => 'lmsace-connect-nonce',
-			'LACONN_MOODLE_COURSE_ID' => 'lac_moodle_course_id',
+			'LACONN_MOODLE_COURSE_ID' => 'lac_moodle_courses',
 			'LMSCONF_DEBUG'        => true,
 			'ENROLLED'             => 1,
 			'NOTENROLLED'          => 0,
@@ -97,6 +105,16 @@ class LACONN {
 			'LACONN_LOG_DIR'		   => $upload_dir['basedir']. '/lac-logs/',
 			'LACONN_IMPORT_LIMIT'	   => 25
 		];
+		$this->define_params( $params );
+	}
+
+	/**
+	 * Define the params.
+	 *
+	 * @param array $params
+	 * @return void
+	 */
+	public function define_params( $params=array() ): void {
 		foreach ($params as $key => $value) {
 			if ( !defined($key) ) {
 				define( $key, $value);
@@ -117,6 +135,27 @@ class LACONN {
 		if (is_admin()) {
 			add_action( 'woocommerce_loaded', array($this, 'woocommerce_version_check'));
 			add_action( 'admin_notices', array($this, 'display_admin_notices') );
+		}
+
+
+		$this->load_submodules();
+	}
+
+	/**
+	 * load all of its submodules.
+	 * Read directory "modules" and check the function "laconn_mod_PLUGINNAME" function exists. Init the functions.
+	 *
+	 * @return void
+	 */
+	public function load_submodules() {
+
+		$dir = scandir( $this->dirroot.'/modules' );
+		$modules = array_diff( $dir, array('.', '..') );
+		foreach ( $modules as $mod ) {
+			$file = $this->dirroot.'/modules/'.$mod.'/module.php';
+			if (file_exists($file)) {
+				require_once($file);
+			}
 		}
 	}
 
@@ -140,12 +179,23 @@ class LACONN {
 			include_once( $this->dirroot.'/includes/admin/class-lac-product-settings.php' );
         }
 
-		foreach ( array_keys($this->handlers) as $key => $handler ) {
-			$handler_class = (new $handler());
-			$handler = str_replace('LACONN_', '', $handler);
+		$this->register_handlers('LACONN_');
+    }
+
+	/**
+	 * Build the handlers class instance and setup class variables. Replaced the key from class name.
+	 * Final handlers instance are looks $this->Admin, $this->Client.
+	 *
+	 * @return void
+	 */
+	public function register_handlers() {
+
+		foreach ( array_keys($this->handlers) as $k => $handler ) {
+			$handler_class = ( new $handler() );
+			$handler = str_replace( self::KEY, '', $handler );
 			$this->{$handler} = $handler_class;
 		}
-    }
+	}
 
 	/**
 	 * Client instance.
@@ -202,6 +252,17 @@ class LACONN {
 	}
 
 	/**
+	 * Check is LAC Pro plugin installed.
+	 */
+	public static function has_pro() {
+		if ( is_plugin_active( 'lmsace-connect-pro/lmsace-connect-pro.php' ) ) {
+			$path = WP_PLUGIN_DIR.'/lmsace-connect-pro/includes/class-lacpro.php';
+			require_once( $path );
+			return false; // true;
+		}
+	}
+
+	/**
 	 * Include required class file and create the class object. Class name must have same as file * name with plugin file keyword.
 	 *
 	 * @param string  $class  Classname.
@@ -213,7 +274,7 @@ class LACONN {
 		$path .= ($is_sub) ? $is_sub.'/' : '';
 		$path .= 'class-lac-'.$class.'.php';
 		require_once($path);
-		$class = 'LACONN_'.ucwords(str_replace( '-', '_', $class));
+		$class = self::KEY.ucwords(str_replace( '-', '_', $class));
 		return (new ReflectionClass ( $class ))->newInstanceArgs ( $params );
 	}
 
@@ -238,17 +299,18 @@ class LACONN {
 	 * @return null
 	 */
 	public function register_actions() {
+
 		add_action('init', array($this, 'register_lac_session'));
 		foreach ( array_keys($this->handlers) as $key => $handler ) {
 			$handler_class = (new $handler());
-			$handler = str_replace('LACONN_', '', $handler);
+			$handler = str_replace( self::KEY, '', $handler);
             $this->{$handler} = $handler_class;
-            if (method_exists($handler_class, 'lac_register_actions')) {
+            if ( method_exists( $handler_class, 'lac_register_actions' ) ) {
                 $handler_class->lac_register_actions();
             }
 
 			// Register admin side based actions.
-			if ( is_admin() && method_exists($this->{$handler}, 'lac_register_admin_actions' ) ) {
+			if ( is_admin() && method_exists( $this->{$handler}, 'lac_register_admin_actions' ) ) {
 				$this->{$handler}->lac_register_admin_actions();
 			}
 		}
@@ -316,10 +378,10 @@ class LACONN {
 	 */
 	public function is_setup_completed() {
 		global $LACONN;
-		
+
 		$options = $this->get_options();
 		if (!isset($options['site_url']) || empty($options['site_url'])) {
-			$this->set_admin_notices('warning', '<h4> LMSACE Connect </h4>'.sprintf( wp_kses( __(' <p> <b>You need to specify a Moodle LMS domain and a Moodle LMS Access token.</b> You must <a href="%s">enter your domain and API key</a> for it to work.</p> ', 'lmsace-connect'), $LACONN->allowed_tags()), 'admin.php?page=lac-admin-settings'), 'connection', true);
+			$this->set_admin_notices('warning', '<h4> LMSACE Connect </h4>'.sprintf( wp_kses(__(' <p> <b>You need to specify a Moodle LMS domain and a Moodle LMS Access token.</b> You must <a href="%s">enter your domain and API key</a> for it to work.</p> ', 'lmsace-connect'), $LACONN->allowed_tags()), 'admin.php?page=lac-admin-settings'), 'connection', true);
 		} else {
 			$request = $this->Client->request(self::services('get_user_roles'), array(), false);
 			if ($request) {
@@ -409,6 +471,12 @@ class LACONN {
 		$_SESSION['lac_admin_flash'][$name] = array( 'type' => $type, 'message' => sanitize_text_field( $message ), 'remove' => $remove );
 	}
 
+	/**
+	 * Removed the admin notifce flash messages.
+	 *
+	 * @param string $name
+	 * @return void
+	 */
 	public function remove_admin_notices($name) {
 		if (isset($_SESSION['lac_admin_flash'][$name]))
 			unset($_SESSION['lac_admin_flash'][$name]);
@@ -417,7 +485,7 @@ class LACONN {
 	/**
 	 * Allowed html tags to kses.
 	 *
-	 * @return array
+	 * @return void
 	 */
 	public function allowed_tags() {
 		return [
@@ -465,9 +533,14 @@ class LACONN {
 			'get_users_courses' => 'core_enrol_get_users_courses',
 			'get_user_roles' => 'local_lmsace_connect_user_roles',
 			'get_limit_courses' => 'local_lmsace_connect_limit_courses',
-			'get_courses_count' => 'local_lmsace_connect_get_courses_count'
+			'get_courses_count' => 'local_lmsace_connect_get_courses_count',
+			'get_courses_detail_by_field' => 'lacpro_coursedata_get_courses_detail_by_field'
 		];
+
+		$services = apply_filters( 'lmsace_connect_get_services', $services );
 
 		return isset($services[$key]) ? $services[$key] : $services;
 	}
+
+
 }

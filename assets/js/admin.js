@@ -20,6 +20,13 @@ jQuery(document).ready(function($) {
 			console.log('Sync Courses Started....');
 			startSyncCourses($(this));
 		});
+
+		if ( $("#login_lms").length ) {
+
+			$("#login_lms").change(function() {
+				hideRedirectLess();
+			})
+		}
 	}
 
 	/**
@@ -113,7 +120,7 @@ jQuery(document).ready(function($) {
 	 */
 	function course_selectbox() {
 		if ($('.woocommerce_options_panel#course_options').length) {
-			$('[name=lac_moodle_course_id]').select2();
+			$('#lac_moodle_courses').select2();
 		}
 	}
 
@@ -231,8 +238,25 @@ jQuery(document).ready(function($) {
 		elem.parent().find('span.result').html(loader);
 	}
 
+	function hideRedirectLess() {
+
+		if ( !$("#login_lms").length ) {
+			return '';
+		}
+
+		if ($("#login_lms").val() == 'course') {
+			$("#redirectless_login").prop('disabled', true);
+			$("#redirectless_login").prop('readonly', true);
+		} else {
+			$("#redirectless_login").prop('disabled', false);
+			$("#redirectless_login").prop('readonly', false);
+		}
+	}
+
 	// Init.
 	register_event_handler();
 	importTable();
 	course_selectbox();
+
+	hideRedirectLess();
 })

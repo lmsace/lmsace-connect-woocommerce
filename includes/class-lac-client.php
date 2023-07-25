@@ -99,13 +99,12 @@ class LACONN_Client {
 			if ($response['response_code'] == 404) {
 				$response['response_message'] = esc_html( __(' URL Not Found, Please check your url', 'lmsace-connect'));
 			} else if ($response['response_code'] == 403) {
-				$response['response_message'] = wp_kses(__(' Forbidden. <ul> <li> Please check your webservice settings on Your LMS </li> </ul>', 'lmsace-connect'), $LACONN->allowed_tags());
+				$response['response_message'] = wp_kses( __(' Forbidden. <ul> <li> Please check your webservice settings on Your LMS </li> </ul>', 'lmsace-connect'), $LACONN->allowed_tags() );
 			}
-
-			 // Returns the request error.
-			return array('error' => true, 'message' => $response['response_message'] );
+			// Returns the request error.
+			return array( 'error' => true, 'message' => $response['response_message'] );
 		}
-		return array('error' => false, 'message' => '' );
+		return array( 'error' => false, 'message' => '' );
 	}
 
 	/**
@@ -228,5 +227,7 @@ class LACONN_Client {
 
 		return $result;
 	}
+
+
 
 }

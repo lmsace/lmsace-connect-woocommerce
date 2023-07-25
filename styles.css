@@ -1,0 +1,31 @@
+.lmsace-connect.course-expand {
+
+}
+.lmsace-connect.course-expand .section-title {
+    display: block;
+}
+.lmsace-connect.course-expand .section-item .modules-list .module-item {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+.lmsace-connect.course-expand .section-item .modules-list .module-item .img-block-laconn {
+    border-radius: 5px;
+    background-color: #eee;
+    padding: 10px;
+    margin-right: 15px;
+    display: inline-flex;
+}
+.lmsace-connect.course-expand .section-item .modules-list .module-item .mod-content .module-title {
+    margin: 10px 0 0;
+}
+.lmsace-connect.course-expand .section-item .modules-list .module-item .mod-content p {
+    display: none;
+}
+ul#lmsace-connect-summary-accord h2 {
+    font-size: 20px;
+}
+
+ul#lmsace-connect-summary-accord h4 {
+    font-size: 16px;
+}

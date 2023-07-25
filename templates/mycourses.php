@@ -17,8 +17,13 @@ if ( !empty($courses) ) {
 		<div class="product-row row">
 
 	<?php
+	$loginurl = apply_filters( 'lmsace_connect_courseurl', $thiscourseurl );
+
+	$courseids = array_column($courses, 'courseid');
+	$md_courses = $LACONN->Course->get_courses_byid( $courseids );
 	foreach ( $courses as $key => $course ) {
 
+		$course = (object) $course;
 		$courseid = $course->courseid;
 		// Get product id from the enrolled LMS course id.
 		$product_id = $course->productid;
@@ -26,15 +31,18 @@ if ( !empty($courses) ) {
 		if (empty($product_id)) continue;
 
 		$product = wc_get_product( $product_id );
-  		$thiscourseurl = $LACONN->site_url.'course/view.php?id='.$courseid;
+  		$thiscourseurl = $loginurl . $LACONN->site_url.'course/view.php?id='.$courseid;
+		$coursename = isset($md_courses[$courseid]) ? $md_courses[$courseid]->fullname : '';
+
 		?>
 			<div class="product-item col-md-3">
 				<div class="img-block">
 					<img src="<?php echo esc_attr( $this->get_product_image($product) );?>" >
 				</div>
 				<div class="product-details">
-					<h4 class="product-name"> <a href="<?php echo esc_attr( $thiscourseurl ); ?>"> <?php echo esc_html( $product->get_name() ); ?> </a> </h4>
-					<a class="button button-primary" href="<?php echo esc_attr( $thiscourseurl ); ?>" > <?php echo esc_html( __("View Course", 'lmsconnect') ); ?> </a>
+					<label><?php echo esc_html( $coursename ); ?> </label>
+					<h4 class="product-name"> <a href="<?php echo esc_attr( $thiscourseurl ); ?>"><?php echo esc_html( $product->get_name() );?> </a> </h4>
+					<a class="button button-primary moodle-course-access" href="<?php echo esc_attr( $thiscourseurl ); ?>" > <?php echo esc_html( __("View Course", 'lmsconnect') ); ?> </a>
 				</div>
 			</div>
 		<?php

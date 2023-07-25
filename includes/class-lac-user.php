@@ -192,20 +192,22 @@ class LACONN_User extends LACONN_Main {
 
 		if (!empty($moo_users)) {
 			// Send the request to connected moodle to create users.
-			$moodle_users = $LACONN->Client->request( LACONN::services('create_users'), array( 'users' => $moo_users ) );
+			$userdata = array( 'users' => $moo_users );
+			// Filter the data to make the SSO changes.
+			$userdata = apply_filters( 'lmsace_connect_create_userdata', $userdata );
+
+			$moodle_users = $LACONN->Client->request( LACONN::services('create_users'), $userdata );
+
+			$moodle_users = apply_filters( 'lmsace_connect_user_create_results', $moodle_users );
 
 			if ( !empty($moodle_users) ) {
 
 				foreach ( $moodle_users as $moodle_user ) {
-
 					// Add moodle userid with the associated wp user.
 					$this->add_user_moodle_id( $user_data->ID, $moodle_user->id );
 					$LACONN->logger()->add( 'order', 'User "'.$moodle_user->username.'" (WPuserid - '. $user_data->ID.') created in moodle and synced with WP');
-
 					$this->set_admin_notices( 'success', esc_html( __('User created successfully on LMS', 'lmsace-connect') ));
-
 					$md_user_id = $moodle_user->id;
-
 				}
 				// Returns the reterived moodle user ids.
 				return $md_user_id;
@@ -235,6 +237,8 @@ class LACONN_User extends LACONN_Main {
 			'lastname' => $lastname,
 			'email' => $user_data->email
 		);
+
+
 
 		return $user_fields;
 	}
@@ -300,7 +304,7 @@ class LACONN_User extends LACONN_Main {
 	public function get_user_moodle_id( $user_id = '', $email=false ) {
 		global $LACONN;
 		if (!empty($user_id)) {
-			$user = ($email) ? get_user_by( 'email', $user_id ) : get_userdata( $user_id );
+			$user = ($email || is_email($user_id)) ? get_user_by( 'email', $user_id ) : get_userdata( $user_id );
 			if ( !empty($user) ) {
 				$args = array( 'field' => 'email', 'values' => array( sanitize_user($user->user_email) ) );
 				$md_user = $LACONN->Client->request( LACONN::services('get_user_by_field'), $args );
@@ -338,9 +342,17 @@ class LACONN_User extends LACONN_Main {
 			)
 		);
 
-		$orders = array_merge($customer_orders, $guest_orders);		
+		$orders = array_merge($customer_orders, $guest_orders);
 
-		return (!empty($orders)) ? $orders : [];
+		// Filter the unique orders.
+		$filterorder = [];
+		foreach ( $orders as $key => $order ) {
+			if (!in_array($order->id, $filterorder)) {
+				$filterorder[] = $order->id;
+				$finalorders[] = $order;
+			}
+		}
+		return (isset($finalorders)) ? $finalorders : [];
 	}
 
 	/**
@@ -351,25 +363,14 @@ class LACONN_User extends LACONN_Main {
 	public function get_user_courses( $user ) {
 
 		if ( $md_user_id = $this->is_moodle_user( $user->ID )) {
-			$this->wooCom = $this->get_handler('woocom');
 			$enrolments = $list = [];
 			if ( $orders = $this->get_user_orders( $user->ID, true ) ) {
 				foreach ( $orders as $key => $order ) {
-					$itemids = [];
 					$orderdata = $order->get_data();
-					$items = $order->get_items();
-					// List of items added in the order.
-					foreach ( $items as $item ) {
-						$productid = $item->get_product_id();
-						if (in_array($productid, $list)) {
-							continue;
-						}
-						array_push($list, $productid);
-						// Moodle course id synced with the selected product.
-						$moodle_courseid = $this->wooCom->get_product_moodle_id( $productid );
-						if ( $orderdata['status'] == 'completed' ) {
-							$enrolments[] = (object) ['productid' => $productid, 'courseid' => $moodle_courseid];
-						}
+					// Moodle course id synced with the selected product.
+					if ( $orderdata['status'] == 'completed' ) {
+						$courses = get_post_meta($order->id, 'lac_enrolments', true);
+						$enrolments = array_merge($enrolments, $courses);
 					}
 				}
 			}
@@ -377,4 +378,6 @@ class LACONN_User extends LACONN_Main {
 		}
 		return [];
 	}
+
+
 }

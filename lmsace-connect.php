@@ -3,15 +3,15 @@
  * Plugin Name: LMSACE Connect - WooCommerce Moodle™ LMS Integration
  * Plugin URI: http://lmsace.com/product/lmsace-connect
  * Description: This plugin connects the Moodle™ LMS + WooCommerce. Helps course creators to sell their Moodle™ LMS courses via WooCommerce.
- * Version: 1.0
+ * Version: 2.0
  * Author: LMSACE
  * Author URI: https://www.lmsace.com/
  * Requires at least: 4.6+
- * Tested up to: 6.0
+ * Tested up to: 6.2.2
  * Requires PHP: 5.6
  *
  * WC requires at least: 3.0
- * WC tested up to: 6.3.1
+ * WC tested up to: 7.8.0
  *
  * License: GNU General Public License v3.0
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -38,14 +38,20 @@ if ( !class_exists('LACONN_Main') ) {
 	}
 	add_action('plugins_loaded', 'lac_load_textdomain');
 
+	/**
+	 * Plugins admin settings.
+	 *
+	 * @param array $links
+	 * @return void
+	 */
 	function lmsace_connect_settings_link($links) {
 		$connection = admin_url().'admin.php?page=lac-connection-options';
-		$settings_link = '<a href="'.$connection.'">'.esc_html(__('Settings', 'lmsace-connect')).'</a>';
+		$settings_link = '<a href="'.$connection.'">'.esc_html( __('Settings', 'lmsace-connect') ).'</a>';
 		array_unshift($links, $settings_link);
 		return $links;
 	}
 	$plugin = plugin_basename( __FILE__ );
-	add_filter("plugin_action_links_$plugin", 'lmsace_connect_settings_link' );
+	add_filter( "plugin_action_links_$plugin", 'lmsace_connect_settings_link' );
 
 	/**
 	 * Create log files and folders to store the logs.
@@ -114,8 +120,21 @@ if ( !class_exists('LACONN_Main') ) {
 	function LACONN() {
 		return LACONN::instance();
 	}
+
+
+
+	function print_object($data) {
+		echo '<pre>';
+		print_r($data);
+		echo '</pre>';
+	}
+
 	// Initialize the plugin intial function to register actions.
 	global $LACONN;
 	$LACONN = LACONN();
 	$LACONN->init();
+
+	// TODO: Update the course product meta to array.
 }
+
+

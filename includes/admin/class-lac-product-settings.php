@@ -18,7 +18,7 @@ function lac_moodle_courses_product_tab_content() {
 	global $post, $LACONN;
 
 	$result = $LACONN->Client->request(LACONN::services('get_courses_by_field'), array('fields' => array(), 'values' => array()));
-	$options = [ 0 => esc_html( __('No Course', LAC_TEXTDOMAIN) ) ];
+	$options = [];
 	if (!empty($result) && isset($result->courses)) {
 		$courses = $result->courses;
 		foreach($courses as $course) {
@@ -33,24 +33,24 @@ function lac_moodle_courses_product_tab_content() {
 	// Note the 'id' attribute needs to match the 'target' parameter set above
 	?><div id='course_options' class='panel woocommerce_options_panel'><?php
 		?><div class='options_group'><?php
-			woocommerce_wp_select( array(
+
+			$attr = array(
 				'id'				=> LACONN_MOODLE_COURSE_ID,
-				'label'				=> esc_html( __( 'Select Course', 'lmsace-connect' )),
+				'label'				=> esc_html( __( 'Select Courses', 'lmsace-connect' )),
 				'desc_tip'			=> 'true',
 				'description'		=> esc_html( __( 'Select the course to make this product as course product.', 'lmsace-connect' )),
-				'custom_attributes'	=> array(),
-				'name'		=> LACONN_MOODLE_COURSE_ID,
-				'options' => $options
-			) );
+				'custom_attributes'	=> array('multiple' => true),
+				'name'		=> LACONN_MOODLE_COURSE_ID."[]",
+				'options' => $options,
+			);
+			// Change the select bar filter options.
+			$attr = apply_filters( 'lmsace_connect_product_select_attributes', $attr );
+
+			woocommerce_wp_select( $attr );
+
 		?></div>
 	</div><?php
 }
 
-/**
- * Save the custom fields.
- */
-function lac_save_moodlecourse_option_fields( $post_id ) {
-	if ( isset( $_POST[LACONN_MOODLE_COURSE_ID] ) ) :
-		update_post_meta( $post_id, LACONN_MOODLE_COURSE_ID, absint( sanitize_text_field( $_POST[LACONN_MOODLE_COURSE_ID] ) ) );
-	endif;
-}
+
+
