@@ -49,16 +49,17 @@ You are developing a custom feature for LMSACE Connect. Please create a pull req
 3. User creation and enrolment on order completion.
 3. User un-enrollment on order cancellation.
 4. Selectable role for participants.
-5. Single Sign ON
-6. Bundle courses in a product.
-7. Import course data.
+5. Seamless login with SSO
+6. Bundle multiple courses in a product.
+7. Import course outline data effortlessly.
+
 
 
 ### Installation steps using ZIP file.
 
 > **Note:** Make sure the **Woocommerce** is correctly installed.
 
-1. Download the plugin file [lmsace-connect-woocommerce.zip](http://www.lmsace.com/plugins/downloads/lmsace-connect-woocommerce.zip)
+1. Download the plugin file [lmsace-connect-woocommerce.zip](https://www.lmsace.com/plugins/downloads/lmsace-connect-woocommerce_v2.0.zip)
 
 2. Next login as Site Administrator
 
@@ -99,7 +100,7 @@ You are developing a custom feature for LMSACE Connect. Please create a pull req
 
 ### Review
 
-You feel LMSACE Connect helps you to sell courses easier. Give a review and rating on wordpress.org. We are looking for your comments.
+You feel LMSACE Connect helps you to sell courses easier. "**Give a review and rating on wordpress.org**". We are looking for your comments.
 
 
 ### Changes log

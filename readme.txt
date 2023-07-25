@@ -1,10 +1,10 @@
 === LMSACE Connect - WooCommerce Moodle™ LMS Integration ===
 Contributors: lmsace
-Tags: LACONN, woocommerce-moodle-integration, moodle-woocommerce-integration, moodle, woocommerce, LMS, moodle+woocommerce, course, course-product, course-purchase, sell-course, buy-course, sell-moodle-course
+Tags: LACONN, woocommerce-moodle-integration, moodle-woocommerce-integration, moodle, woocommerce, LMS, moodle+woocommerce, course, course-product, course-purchase, sell-course, buy-course, sell-moodle-course, lmsace-connect, moodle-sso, moodle-wordpress-sso, moodle-woocommerce-sso
 Requires at least: 4.6
-Tested up to: 6.0
+Tested up to: 6.2.2
 Requires PHP: 5.6
-Stable tag: 1.0
+Stable tag: 2.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -72,7 +72,7 @@ If you love our plugin, please give us a full five-star rating so that we know t
 
 = Manual installation =
 
-1. Download the plugin file [lmsace-connect-woocommerce.zip](http://www.lmsace.com/plugins/downloads/lmsace-connect-woocommerce.zip)
+1. Download the plugin file [lmsace-connect-woocommerce.zip](https://www.lmsace.com/plugins/downloads/lmsace-connect-woocommerce.zip)
 2. In your WordPress admin area, navigate to PLUGINS > ADD NEW
 3. Click Upload Plugin
 4. Browse for **lmsace-connect-woocommerce.zip** file you downloaded in Step 1
@@ -81,7 +81,7 @@ If you love our plugin, please give us a full five-star rating so that we know t
 
 **In the same way, you have to install the [LMSACE Connect’s](https://github.com/lmsace/lmsace-connect-moodle) corresponding Moodle™ plugin too ( Manual Installation )**
 
-**Please follow the steps described in the [Documentation Wiki](https://github.com/lmsace/lmsace-connect-woocommerce/wiki) to **Setup the connection and SSO** between WooCommerce and Moodle™ LMS.**
+**Please follow the steps described in the [Documentation Wiki](https://github.com/lmsace/lmsace-connect-woocommerce/wiki) to **Setup the connection and SSO** between WooCommerce and Moodle™ Software.**
 
 == Screenshots ==
 
