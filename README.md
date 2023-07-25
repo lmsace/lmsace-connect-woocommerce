@@ -2,16 +2,18 @@
 LMSACE Connect
 ==================
 
-**LMSACE Connect** is a woocommerce integration plugin that focused on the Moodle + WooCommerce Integrations.
+**LMSACE Connect** is a woocommerce integration plugin that focused on the Moodle™ Software + WooCommerce Integrations.
 
-It gives the course creatores as options to import courses from the Moodle LMS and create courses as woocommerce products and sell their courses to customer.
+It gives the course creatores as options to import courses from the Moodle™ Software and create courses as woocommerce products and sell their courses to customer.
 
-Once the course products are purchased by customer, Plugin will create those users on Moodle LMS and enrol them into the linked course.
+Once the course products are purchased by customer, Plugin will create those users on Moodle™ Software and enrol them into the linked course.
+
+With the new version, we've added exciting features to further enhance your e-learning experience. Enjoy the seamless login with SSO, sync multiple courses with a single product, and import course outline data effortlessly.
 
 
-### Moodle Side Plugin.
+### Moodle™ Software Side Plugin.
 
-Please install the Moodle side plugin to generate the token easier.
+Please install the Moodle™ Software side plugin to generate the token easier and setup the connection between Moodle™ Software and Wordpress. This plugin should be installed on your Moodle™ Software.
 
 [https://github.com/lmsace/lmsace-connect-moodle](https://github.com/lmsace/lmsace-connect-moodle)
 
@@ -27,12 +29,12 @@ Plugin URI: https://woocommerce.com/
 
 ## Documenation
 
-The official documentation to setup connections and SSO between Moodle and WooCommerce using LMSACE Connect can be found at [https://github.com/lmsace/lmsace-connect-woocommerce/wiki](https://github.com/lmsace/lmsace-connect-woocommerce/wiki)
+The official documentation to setup connections and SSO between Moodle™ Software and WooCommerce using LMSACE Connect can be found at [https://github.com/lmsace/lmsace-connect-woocommerce/wiki](https://github.com/lmsace/lmsace-connect-woocommerce/wiki)
 
 
 ## Bugs and Problems Report.
 
-This plugin is carefully developed and highly tested with multiple versions of Moodle LMS, WordPress, and WooCommerce. If you found any issues with LMSACE Connect or you have any problems or difficulty with its workflow please feel free to report on Github: http://github.com/lmsace/lmsace-connect/issues. We will do our best to solve the problems.
+This plugin is carefully developed and highly tested with multiple versions of Moodle™ Software, WordPress, and WooCommerce. If you found any issues with LMSACE Connect or you have any problems or difficulty with its workflow please feel free to report on Github: http://github.com/lmsace/lmsace-connect/issues. We will do our best to solve the problems.
 
 
 ## Feature Proposals.
@@ -56,27 +58,25 @@ You are developing a custom feature for LMSACE Connect. Please create a pull req
 
 > **Note:** Make sure the **Woocommerce** is correctly installed.
 
-1. Clone Project Git repository in any of your preferred locations.
+1. Download the plugin file [lmsace-connect-woocommerce.zip](http://www.lmsace.com/plugins/downloads/lmsace-connect-woocommerce.zip)
 
-2. Rename the folder name to '**lmsace-connect**'.
+2. Next login as Site Administrator
 
-3. Next login as Site Administrator
+3. Go to '*Plugins*' -> '*Add New*' -> '*Upload Plugin*', On here upload the plugin zip '**lmsace-connect.zip**'.
 
-4. Go to '*Plugins*' -> '*Add New*' -> '*Upload Plugin*', On here upload the plugin zip '**lmsace-connect.zip**'.
-
-5. Click the "**Instal Now**" button.
+4. Click the "**Instal Now**" button.
 
 
 > You will get a **success message** once the plugin is installed successfully.
 
 
-6. By clicking the "**Activate**" button on the success page, Plugin will be activated and you will redirect to Your dashboard.
+5. By clicking the "**Activate**" button on the success page, Plugin will be activated and you will redirect to Your dashboard.
 
 
 ### Installation steps using Git.
 
 
-1. Clone **LMSACE Connect** plugin Git repository into the folder '*plugins*'.
+1. Clone [**LMSACE Connect WooCommerce**](https://github.com/lmsace/lmsace-connect-woocommerce) plugin Git repository into the folder '*plugins*'.
 
 > '*Your root diroctory*' -> '*wp-content*' -> '*plugins*'.
 
@@ -87,6 +87,9 @@ You are developing a custom feature for LMSACE Connect. Please create a pull req
 4. Go to the '*Plugins*' -> '*Installed plugins*'. Here LMSACE Connect plugin will be listed.
 
 5. Activate the plugin by clicking the "**Activate**" button placed on the bottom of the plugin name, Plugin will get the success message.
+
+
+> Once the wordpress side plugin was installed, Please **install the mandatory Moodle™ software side plugin to generate the token and setup the connection** between Moodle and Wordpress.
 
 
 ## Copyright

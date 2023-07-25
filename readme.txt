@@ -12,7 +12,7 @@ LMSACE Connect plugin connects the popular Moodle™ LMS with woocommerce. LMSAC
 
 == Description ==
 
-This plugin is an extension of WooCommerce which allows you to sell your Moodle™ LMS courses with WooCommerce shopping cart. Simply assign Moodle™ course(s) to a WooCommerce product. When a student purchases the product in Woocommerce, they will be automatically enrolled into the associated course(s) in Moodle™ LMS.
+This plugin is an extension of WooCommerce, which allows you to sell your Moodle™ LMS courses with the WooCommerce shopping cart. Simply assign Moodle™ course(s) to a WooCommerce product. When a student purchases the product in WooCommerce, they will be automatically enrolled in the associated course(s) in Moodle™ LMS. With the new version, we've added exciting features to further enhance your e-learning experience. Enjoy the seamless login with SSO, sync multiple courses with a single product, and import course outline data effortlessly.
 
 **Plugin Features**
 
@@ -22,6 +22,8 @@ This plugin is an extension of WooCommerce which allows you to sell your Moodle�
 - Choose any payment gateway offered by Woocommerce and use it to accept payment for your Moodle™ LMS courses.
 - After a successful product purchase in Woocommerce, the integration will auto-enroll the customer into the Moodle™ course(s) so that they can begin taking the course.
 - Removes users from Moodle™ courses when refunded or cancelling a Woocommerce order.
+- Seamless login with SSO
+- Import course outline data effortlessly.
 
 **Benefits of integrating Moodle™ LMS with Woocommerce Store**
 
@@ -36,7 +38,7 @@ There are several benefits of using WooCommerce as your shopping cart solution w
 - WooCommerce Integrates With Most CRM Platforms
 - Automatically enroll students after payment
 - You Can Add up-sells, order bumps, and other revenue boosters
-- [PRO] Sell multiple courses bundled
+- Sell multiple courses bundled
 - [PRO] Monetize online courses via offering membership subscriptions
 
 **Suggestions**
@@ -79,7 +81,7 @@ If you love our plugin, please give us a full five-star rating so that we know t
 
 **In the same way, you have to install the [LMSACE Connect’s](https://github.com/lmsace/lmsace-connect-moodle) corresponding Moodle™ plugin too ( Manual Installation )**
 
-**Please follow the steps described in the [README.MD](https://github.com/lmsace/lmsace-connect-woocommerce) to **Setup the connection** between WooCommerce and Moodle™ LMS.**
+**Please follow the steps described in the [Documentation Wiki](https://github.com/lmsace/lmsace-connect-woocommerce/wiki) to **Setup the connection and SSO** between WooCommerce and Moodle™ LMS.**
 
 == Screenshots ==
 
@@ -122,3 +124,8 @@ Initial LMSACE Connect Release Version
 
 = 1.0 =
 Initial release. No upgrade notices
+
+= 2.0 =
+SSO feature implemented.
+Bundle multiple courses in a single product.
+Import course with outline data.
