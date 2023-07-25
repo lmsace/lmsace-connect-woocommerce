@@ -183,7 +183,7 @@ class LACONNMOD_SSO_Admin extends LACONN_Admin {
 	 * @return void
 	 */
 	public function sso_config_section() {
-		esc_html_e('Sign in the users into LMS when they loggedin to wordpress.', 'lmsace-connect');
+		esc_html_e('Configure SSO to sign in to LMS automatically with WordPress login', 'lmsace-connect');
 	}
 
 }

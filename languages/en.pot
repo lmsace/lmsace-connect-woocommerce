@@ -1,0 +1,225 @@
+# Copyright (C) 2023 LMSACE
+# This file is distributed under the GNU General Public License v3.0.
+msgid ""
+msgstr ""
+"Project-Id-Version: LMSACE Connect - WooCommerce Moodle™ LMS Integration 2.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/lmsace-connect\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2023-07-25T15:34:04+02:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.8.1\n"
+"X-Domain: lmsace-connect\n"
+
+#. Plugin Name of the plugin
+msgid "LMSACE Connect - WooCommerce Moodle™ LMS Integration"
+msgstr ""
+
+#. Plugin URI of the plugin
+msgid "http://lmsace.com/product/lmsace-connect"
+msgstr ""
+
+#. Description of the plugin
+msgid "This plugin connects the Moodle™ LMS + WooCommerce. Helps course creators to sell their Moodle™ LMS courses via WooCommerce."
+msgstr ""
+
+#. Author of the plugin
+msgid "LMSACE"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://www.lmsace.com/"
+msgstr ""
+
+#: includes/admin/class-lac-admin.php:45
+msgid "Connection Setup"
+msgstr ""
+
+#: includes/admin/class-lac-admin.php:46
+msgid "General Setup"
+msgstr ""
+
+#: includes/admin/class-lac-admin.php:47
+msgid "Import Courses"
+msgstr ""
+
+#: includes/admin/class-lac-admin.php:108
+msgid "All Categories"
+msgstr ""
+
+#: includes/admin/class-lac-admin.php:109
+msgid "Reload Courses"
+msgstr ""
+
+#: includes/admin/class-lac-admin.php:110
+msgid "Filter category"
+msgstr ""
+
+#: includes/admin/class-lac-admin.php:111
+msgid "Settings saved successfully"
+msgstr ""
+
+#: includes/admin/class-lac-admin.php:149
+msgid "Callback function not available."
+msgstr ""
+
+#: includes/admin/class-lac-admin.php:152
+msgid "Callback function not added."
+msgstr ""
+
+#: includes/admin/class-lac-admin.php:377
+msgid "Selective Courses import"
+msgstr ""
+
+#: includes/admin/class-lac-admin.php:510
+msgid "General options"
+msgstr ""
+
+#: includes/admin/class-lac-admin.php:525
+msgid "User enrolment status on Order Refund/Cancellation"
+msgstr ""
+
+#: includes/admin/class-lac-admin.php:533
+msgid "Select a role for the participants in Moodle LMS"
+msgstr ""
+
+#: includes/admin/class-lac-admin.php:609
+msgid " Connected successfully "
+msgstr ""
+
+#: includes/admin/class-lac-admin.php:611
+msgid "Connection Failed"
+msgstr ""
+
+#: includes/admin/class-lac-admin.php:615
+msgid "Connect"
+msgstr ""
+
+#: includes/admin/class-lac-product-settings.php:39
+msgid "Select Courses"
+msgstr ""
+
+#: includes/admin/class-lac-product-settings.php:41
+msgid "Select the course to make this product as course product."
+msgstr ""
+
+#: includes/class-lac-client.php:100
+msgid " URL Not Found, Please check your url"
+msgstr ""
+
+#: includes/class-lac-client.php:102
+msgid " Forbidden. <ul> <li> Please check your webservice settings on Your LMS </li> </ul>"
+msgstr ""
+
+#: includes/class-lac-user.php:209
+msgid "User created successfully on LMS"
+msgstr ""
+
+#: includes/class-lac-user.php:216
+msgid "Oops! User can't created on LMS for this order. <br> %s"
+msgstr ""
+
+#: includes/class-lac-woocom.php:165
+msgid "Disable the guest checkout on woocommerce.."
+msgstr ""
+
+#: includes/class-lac-woocom.php:252
+msgid "User %1s enrolled on the courses"
+msgstr ""
+
+#: includes/class-lac-woocom.php:259
+msgid "Can't able to create user in Moodle"
+msgstr ""
+
+#: includes/class-lac-woocom.php:262
+msgid "Order user not created in WordPress"
+msgstr ""
+
+#: includes/class-lac-woocom.php:494
+msgid "User with email %s, suspended in the course %s "
+msgstr ""
+
+#: includes/class-lac-woocom.php:496
+msgid "User with email %s, enrolled in the course %s "
+msgstr ""
+
+#: includes/class-lac-woocom.php:498
+msgid "( View course on LMS )"
+msgstr ""
+
+#: includes/class-lac-woocom.php:537
+msgid "My Courses"
+msgstr ""
+
+#: includes/class-lac.php:343
+msgid "You must install and activate WooCommerce plugin to use this LMSACE Connect plugin. "
+msgstr ""
+
+#: includes/class-lac.php:346
+msgid "You must activate WooCommerce plugin to use this LMSACE Connect plugin."
+msgstr ""
+
+#: includes/class-lac.php:369
+msgid "Not compatible with installed woocommerce plugin, Please upgrade your woocommerce"
+msgstr ""
+
+#: includes/class-lac.php:384
+msgid " <p> <b>You need to specify a Moodle LMS domain and a Moodle LMS Access token.</b> You must <a href=\"%s\">enter your domain and API key</a> for it to work.</p> "
+msgstr ""
+
+#: includes/class-lac.php:392
+msgid "Moodle and WooCommerce connection failed! Please check your details "
+msgstr ""
+
+#: lmsace-connect.php:49
+msgid "Settings"
+msgstr ""
+
+#: modules/sso/includes/admin/class-lacsso-admin.php:68
+msgid "Single Sign On"
+msgstr ""
+
+#: modules/sso/includes/admin/class-lacsso-admin.php:75
+msgid "SSO Activation Method"
+msgstr ""
+
+#: modules/sso/includes/admin/class-lacsso-admin.php:83
+msgid "Redirectless login"
+msgstr ""
+
+#: modules/sso/includes/admin/class-lacsso-admin.php:91
+msgid "Create users in Moodle on new registration"
+msgstr ""
+
+#: modules/sso/includes/admin/class-lacsso-admin.php:143
+msgid "Login on WP"
+msgstr ""
+
+#: modules/sso/includes/admin/class-lacsso-admin.php:146
+msgid "Access the course"
+msgstr ""
+
+#: modules/sso/includes/admin/class-lacsso-admin.php:169
+msgid ""
+" The <b> Manual method </b> allows users to log in to Moodle via WordPress and automatically creates a Moodle user with a new password.\r\n"
+"\t\t\tThe user's password is then sent to them via email, enabling them to log in to Moodle directly using the shared credentials.\r\n"
+"\t\t\tAlso it allows users to login via SSO"
+msgstr ""
+
+#: modules/sso/includes/admin/class-lacsso-admin.php:173
+msgid ""
+"The <b>LMSACE Connect </b> method offers SSO integration with Moodle LMS using the auth_lmsace_connect authentication method.\r\n"
+"\t\t\tWith this method, LMSACE Connect creates a new user without a password in Moodle.\r\n"
+"\t\t\tUsers can only access the Moodle site using SSO, and direct login into Moodle is disabled."
+msgstr ""
+
+#: modules/sso/includes/admin/class-lacsso-admin.php:186
+msgid "Configure SSO to sign in to LMS automatically with WordPress login"
+msgstr ""
+
+#: templates/coursedata.php:9
+msgid "General"
+msgstr ""
