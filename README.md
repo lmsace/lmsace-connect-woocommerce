@@ -51,7 +51,7 @@ You are developing a custom feature for LMSACE Connect. Please create a pull req
 4. Selectable role for participants.
 5. Seamless login with SSO
 6. Bundle multiple courses in a product.
-7. Import course outline data effortlessly.
+7. Import courses with syllabus summary.
 
 
 
