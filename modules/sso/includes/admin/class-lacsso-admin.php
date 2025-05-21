@@ -29,8 +29,8 @@ class LACONNMOD_SSO_Admin extends LACONN_Admin {
 	 * @return instance LACONN Admin instance
 	 */
 	public static function instance() {
-		if ( ! isset( self::$instance ) && ! ( self::$instance instanceof LACONNPRO_Admin ) ) {
-			self::$instance = new LACONNPRO_Admin;
+		if ( ! isset( self::$instance ) && ! ( self::$instance instanceof self ) ) {
+			self::$instance = new self;
 		}
 		return self::$instance;
 	}

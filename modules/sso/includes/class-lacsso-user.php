@@ -11,21 +11,21 @@
 class LACONNMOD_SSO_User extends LACONN_Main {
 
     /**
-	 * LACONNPRO_User class instance object.
+	 * LACONNMOD_SSO_User class instance object.
 	 *
-	 * @var LACONNPRO_User
+	 * @var LACONNMOD_SSO_User
 	 */
 	public $instance;
 
 	/**
 	 * Returns an instance of the plugin object
 	 *
-	 * @return LACONNPRO_User Main instance
+	 * @return LACONNMOD_SSO_User Main instance
 	 *
 	 */
 	public static function instance() {
-		if ( ! isset( self::$instance ) && ! ( self::$instance instanceof LACONNPRO_User ) ) {
-			self::$instance = new LACONNPRO_User;
+		if ( ! isset( self::$instance ) && ! ( self::$instance instanceof LACONNMOD_SSO_User ) ) {
+			self::$instance = new LACONNMOD_SSO_User;
 		}
 		return self::$instance;
 	}
