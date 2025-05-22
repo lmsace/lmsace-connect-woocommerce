@@ -415,23 +415,19 @@ class LACONN_Course extends LACONN_Main {
 		$product->set_name($course->fullname);
 		$product->set_description($course->summary);
 		$product->set_status(($course->visible && !$make_draft) ? 'publish' : 'draft');
-		$product->set_catalog_visibility(($course->visible) ? 'visible' : 'hidden');
-		$product->set_sku($course->shortname);
-		$product->set_virtual(true);
-		$product->set_downloadable(false);
-		$product->set_regular_price('0');
-		$product->set_manage_stock(false);
-		$product->set_stock_status('instock');
-		$product->set_sold_individually(false);
-		$product->set_featured(false);
+		// Properties like SKU, virtual, downloadable, price etc., will be set in update_course_meta
+
 		$product->set_reviews_allowed(false);
 		$product->set_menu_order(0);
 		$product->set_date_created(current_time('timestamp'));
 		$product->set_date_modified(current_time('timestamp'));
+
 		$product_id = $product->save();
+
 		if ($product_id) {
 			// Set product type explicitly
 			wp_set_object_terms($product_id, 'simple', 'product_type');
+
 			// Set categories
 			if ($assign_category) {
 				$terms = $this->get_term_from_moodle_categoryid($course->categoryid);
@@ -460,12 +456,15 @@ class LACONN_Course extends LACONN_Main {
 					}
 				}
 			}
-			// Update course meta
-			$this->update_course_meta($product_id, $course, $make_draft);
+
+			// Update course meta using the new centralized method
+			$this->update_course_meta($product, $course); // Pass WC_Product object
+
 			// Course summary images
 			$summary = $this->admin->replace_coursesummary_images($product_id, $course);
 			$postcontent = [ 'ID' => $product_id, 'post_content' => $summary ];
 			wp_update_post($postcontent, true);
+
 			// Product image
 			$image = $this->admin->get_course_image($course);
 			$this->upload_product_image($product_id, [$image]);
@@ -492,24 +491,20 @@ class LACONN_Course extends LACONN_Main {
 		if (!$product) {
 			return false;
 		}
+
 		$product->set_name($course->fullname);
 		$product->set_description($course->summary);
 		$product->set_status(($course->visible && !$make_draft) ? 'publish' : 'draft');
-		$product->set_catalog_visibility(($course->visible) ? 'visible' : 'hidden');
-		$product->set_sku($course->shortname);
-		$product->set_virtual(true);
-		$product->set_downloadable(false);
-		$product->set_regular_price('0');
-		$product->set_manage_stock(false);
-		$product->set_stock_status('instock');
-		$product->set_sold_individually(false);
-		$product->set_featured(false);
+		// Properties like SKU, virtual, downloadable, price etc., will be set in update_course_meta
+
 		$product->set_reviews_allowed(false);
 		$product->set_menu_order(0);
 		$product->set_date_modified(current_time('timestamp'));
+
 		$product_id = $product->save();
+
 		if ($product_id) {
-			wp_set_object_terms($post_id, 'simple', 'product_type');
+			wp_set_object_terms($post_id, 'simple', 'product_type'); // $post_id or $product_id should be the same
 			if ($assign_category) {
 				$terms = $this->get_term_from_moodle_categoryid($course->categoryid);
 				$categories = array();
@@ -537,7 +532,10 @@ class LACONN_Course extends LACONN_Main {
 					}
 				}
 			}
-			$this->update_course_meta($post_id, $course, $make_draft);
+
+			// Update course meta using the new centralized method
+			$this->update_course_meta($product, $course); // Pass WC_Product object
+
 			// Course summary images
 			$summary = $this->admin->replace_coursesummary_images($post_id, $course);
 			$summary = '[lmsace_connect_summary]'.$summary.'[/lmsace_connect_summary]';
@@ -551,6 +549,7 @@ class LACONN_Course extends LACONN_Main {
 			}
 			$postarr = array('ID' => $post_id, 'post_content' => $summary);
 			wp_update_post($postarr, true);
+
 			// Product image
 			$image = $this->admin->get_course_image($course);
 			$this->upload_product_image($post_id, [$image]);
@@ -560,36 +559,54 @@ class LACONN_Course extends LACONN_Main {
 	}
 
 	/**
-	 * Update the product meta data based on the course object.
+	 * Update the product meta data based on the course object using WC_Product methods.
 	 *
-	 * @param int $post_id
-	 * @param object $course
+	 * @param WC_Product $product The WooCommerce product object.
+	 * @param object $course The course data object from Moodle.
 	 * @return void
 	 */
-	public function update_course_meta($post_id, $course) {
+	public function update_course_meta(WC_Product $product, $course) {
+		$product_id = $product->get_id();
 
-	    update_post_meta( $post_id, '_product_attributes',  array('term_id' => $course->categoryid) );
-	    update_post_meta( $post_id, '_sku', $course->shortname );
-		update_post_meta( $post_id, '_visibility', ($course->visible) ? 'visible' : 'hide' );
-		// LAConnect support multiple courses link with single product.
-		$courses = array( $course->id );
-		if ( ! metadata_exists('post', $post_id, LACONN_MOODLE_COURSE_ID) ) {
-	    	add_post_meta( $post_id, LACONN_MOODLE_COURSE_ID, $courses);
+		// SKU
+		$product->set_sku($course->shortname);
+
+		// Catalog Visibility
+		$product->set_catalog_visibility(($course->visible) ? 'visible' : 'hidden');
+
+		// Stock Status
+		$product->set_stock_status('instock');
+
+		// Sales - typically managed by WC, but can be initialized/reset
+		$product->set_total_sales(0);
+
+		// Product Type Flags
+		$product->set_downloadable(false); // Courses are not downloadable files
+		$product->set_virtual(true);    // Courses are virtual products
+
+		// Pricing
+		$product->set_regular_price('0'); // Default price, can be configured elsewhere if needed
+		$product->set_sale_price('');     // Default, no sale price
+
+		// Other Flags
+		$product->set_featured(false);
+		$product->set_sold_individually(false); // Usually false for courses unless specified
+
+		// Inventory Settings
+		$product->set_manage_stock(false); // No stock management for virtual courses
+		$product->set_backorders('no');    // Not applicable if not managing stock
+
+		// Custom Meta: LACONN_MOODLE_COURSE_ID
+		// LAConnect support multiple courses link with single product (though current logic stores one).
+		$courses_meta_value = array($course->id);
+		if (!metadata_exists('post', $product_id, LACONN_MOODLE_COURSE_ID)) {
+			add_post_meta($product_id, LACONN_MOODLE_COURSE_ID, $courses_meta_value);
 		} else {
-	    	update_post_meta( $post_id, LACONN_MOODLE_COURSE_ID, $courses);
+			update_post_meta($product_id, LACONN_MOODLE_COURSE_ID, $courses_meta_value);
 		}
 
-	    update_post_meta( $post_id, '_stock_status', 'instock');
-	    update_post_meta( $post_id, 'total_sales', '0' );
-	    update_post_meta( $post_id, '_downloadable', 'no' );
-	    update_post_meta( $post_id, '_virtual', 'yes' );
-	    update_post_meta( $post_id, '_regular_price', '00' );
-	    update_post_meta( $post_id, '_sale_price', '' );
-	    update_post_meta( $post_id, '_featured', 'no' );
-	    update_post_meta( $post_id, '_sold_individually', '' );
-	    update_post_meta( $post_id, '_manage_stock', 'no' );
-	    update_post_meta( $post_id, '_backorders', 'no' );
-	    update_post_meta( $post_id, '_stock', '' );
+		// Note: The original _product_attributes line was removed as it was likely incorrect.
+		// Categories are assigned via wp_set_object_terms in create_course/update_course.
 	}
 
 	/**

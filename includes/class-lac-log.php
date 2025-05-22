@@ -27,6 +27,13 @@ class LACONN_Log extends LACONN_Main {
     public static $instance;
 
 	/**
+	 * Path to the log directory.
+	 *
+	 * @var string
+	 */
+	public $logpath;
+
+	/**
 	 * Constructor.
 	 */
     public function __construct() {

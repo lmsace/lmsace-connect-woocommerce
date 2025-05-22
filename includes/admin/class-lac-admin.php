@@ -24,6 +24,13 @@ class LACONN_Admin extends LACONN_Main {
 	public $instance;
 
 	/**
+	 * LMSACE Connect Admin Request handler instance.
+	 *
+	 * @var LACONN_Admin_request
+	 */
+	public $admin_request;
+
+	/**
 	 * Returns an instance of the plugin object
 	 *
 	 * @return instance LACONN Admin instance
