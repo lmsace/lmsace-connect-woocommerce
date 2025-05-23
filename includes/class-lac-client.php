@@ -228,6 +228,24 @@ class LACONN_Client {
 		return $result;
 	}
 
+	public function confirm_service($service) {
+		// Check the service is available or not.
+		$response = $this->request('core_webservice_get_site_info', array());
 
+		if (empty($response->functions)) {
+			return false;
+		}
+
+		$functions = $response->functions;
+		// echo $service;
+		// echo '<pre>';print_r($functions);echo '</pre>';exit;
+		foreach ($functions as $function) {
+			if ($function->name == $service) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 }

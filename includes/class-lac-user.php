@@ -196,6 +196,7 @@ class LACONN_User extends LACONN_Main {
 			// Filter the data to make the SSO changes.
 			$userdata = apply_filters( 'lmsace_connect_create_userdata', $userdata );
 
+			// Send the request to create users.
 			$moodle_users = $LACONN->Client->request( LACONN::services('create_users'), $userdata );
 
 			$moodle_users = apply_filters( 'lmsace_connect_user_create_results', $moodle_users );
@@ -213,7 +214,7 @@ class LACONN_User extends LACONN_Main {
 				return $md_user_id;
 			}
 		}
-		$this->set_admin_notices( 'error', esc_html( __( "Oops! User can't created on LMS for this order. <br> %s", 'lmsace-connect' ) ), $moodle_users );
+		$this->set_admin_notices( 'error', __( "Oops! User can't created on LMS for this order. <br> %s", 'lmsace-connect' ), $moodle_users );
 
 		return false;
 	}
@@ -342,7 +343,13 @@ class LACONN_User extends LACONN_Main {
 			)
 		);
 
-		$orders = array_merge($customer_orders, $guest_orders);
+		$query = new WC_Order_Query( array(
+			'billing_email' => ($customer->get_email()) ? sanitize_email( $customer->get_email() ) : sanitize_email( $customer->get_billing_email() ),
+			'limit'         => -1,
+		) );
+		$hpos_orders = $query->get_orders();
+
+		$orders = array_merge($customer_orders, $guest_orders, $hpos_orders);
 
 		// Filter the unique orders.
 		$filterorder = [];
@@ -369,7 +376,8 @@ class LACONN_User extends LACONN_Main {
 					$orderdata = $order->get_data();
 					// Moodle course id synced with the selected product.
 					if ( $orderdata['status'] == 'completed' ) {
-						$courses = get_post_meta($order->id, 'lac_enrolments', true);
+						$courses = ($order instanceof \Automattic\WooCommerce\Admin\Overrides\Order)
+							? $order->get_meta('lac_enrolments', true) : get_post_meta($order->id, 'lac_enrolments', true);
 						$enrolments = array_merge($enrolments, $courses);
 					}
 				}

@@ -244,6 +244,7 @@ class LACONN_Woocom extends LACONN_Main {
 					}
 
 					if ( isset($enrolments) && !empty($enrolments) ) {
+
 						$result = $this->enrol_user_moodle($enrolments);
 						if ( $result != null ) {
 							$details['order']->update_meta_data( 'lac_enrolments', $metaenrols );
@@ -264,7 +265,6 @@ class LACONN_Woocom extends LACONN_Main {
 			}
 			$t = $details['order']->save();
 		}
-		// exit;
 	}
 
 	/**
@@ -357,11 +357,21 @@ class LACONN_Woocom extends LACONN_Main {
 		$products = $order->get_items();
 
 		// Order User object.
-		$user = $order->get_user() ? $order->get_user()->data : new stdclass();
+		$orderuser = $order->get_user();
+		// Get the user data from order object.
+		$user = $orderuser ? $orderuser->data : new stdclass();
+
+		// Ensure firstname and lastname are set for registered users.
+		if ( $orderuser ) {
+			$user_id = $order->get_user()->ID;
+			$user->firstname = get_user_meta($user_id, 'first_name', true) ?: $order->get_billing_first_name();
+			$user->lastname = get_user_meta($user_id, 'last_name', true) ?: $order->get_billing_last_name();
+		}
 
 		if (!isset($user->email) && isset($user->user_email) && !empty($user->user_email)) {
 			$user->email = $user->user_email;
 		}
+
 		// Adding guest user support.
 		if (!isset($user->email) || $user->email == '') {
 			// Set the billing email as user email if it's empty.

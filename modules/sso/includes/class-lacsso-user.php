@@ -166,6 +166,7 @@ class LACONNMOD_SSO_User extends LACONN_Main {
 	public function sso_request( $user_login, $user ) {
 		global $LACONN;
 		static $response;
+
 		if ( $response == '' ) {
 			$user_email = $user->data->user_email;
 			$data = $this->fetch_user_creationdata( $user_email );
@@ -173,6 +174,8 @@ class LACONNMOD_SSO_User extends LACONN_Main {
 			if ( empty($user_email) ) {
 				return;
 			}
+
+
 
 			$response = $LACONN->Client->request( LACONN::services('generate_userloginkey'), ['user' => $data] );
 			if ( isset($response->loginkey) && !empty($response->loginkey) ) {
@@ -201,32 +204,35 @@ class LACONNMOD_SSO_User extends LACONN_Main {
             return true;
         }
 
-		$response = $this->sso_request( $user_login, $user );
-		if ( isset($response->loginkey) && !empty($response->loginkey) ) {
-			$key = $response->loginkey;
-			$authdata = [
-				'wstoken' => $this->site_token,
-			];
+		if ( $LACONN->Client->confirm_service( LACONN::services('generate_userloginkey') ) ) {
 
-			$mood_login_url = $this->site_url.'auth/lmsace_connect/land.php?'. http_build_query($authdata);
-			if ( isset($options['redirectless_login']) && $options['redirectless_login'] == 1 ) {
-				$result = wp_remote_post($mood_login_url, [ 'body' => array('key' => $key) ]);
-				$cookie = wp_remote_retrieve_cookie($result, LACONN_MOODLESESSION);
-				if (!empty($cookie)) {
-					// Setup the moodle session for the user.
-					setcookie('MoodleSession', $cookie->value, $cookie->expires, $cookie->path);
+			$response = $this->sso_request( $user_login, $user );
+			if ( isset($response->loginkey) && !empty($response->loginkey) ) {
+				$key = $response->loginkey;
+
+				$authdata = [
+					'wstoken' => $this->site_token,
+				];
+
+				$mood_login_url = $this->site_url.'auth/lmsace_connect/land.php?'. http_build_query($authdata);
+				if ( isset($options['redirectless_login']) && $options['redirectless_login'] == 1 ) {
+					$result = wp_remote_post($mood_login_url, [ 'body' => array('key' => $key) ]);
+					$cookie = wp_remote_retrieve_cookie($result, LACONN_MOODLESESSION);
+					if (!empty($cookie)) {
+						// Setup the moodle session for the user.
+						setcookie('MoodleSession', $cookie->value, $cookie->expires, $cookie->path);
+						$this->set_session_data('moodlelms_loggedin', true);
+					}
+
+				} else {
+					$myaccount = get_permalink( wc_get_page_id( 'myaccount' ) );
+					$mood_login_url .= '&key='.$key.'&wpredirect='.$myaccount;
 					$this->set_session_data('moodlelms_loggedin', true);
+					wp_redirect($mood_login_url);
+					exit;
 				}
-
-			} else {
-				$myaccount = get_permalink( wc_get_page_id( 'myaccount' ) );
-				$mood_login_url .= '&key='.$key.'&wpredirect='.$myaccount;
-				$this->set_session_data('moodlelms_loggedin', true);
-				wp_redirect($mood_login_url);
-				exit;
 			}
-		} else {
-			// TODO: need to manage the execeptions.
+
 		}
     }
 

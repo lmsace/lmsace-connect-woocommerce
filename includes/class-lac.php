@@ -127,7 +127,8 @@ class LACONN {
 	 *
 	 * @return null
 	 */
-	public function init() {
+	public function init( $submodules=true ) {
+
 		if ( $this->is_woocommerce_installed() ) {
 			$this->register_actions();
 		}
@@ -137,8 +138,9 @@ class LACONN {
 			add_action( 'admin_notices', array($this, 'display_admin_notices') );
 		}
 
-
-		$this->load_submodules();
+		if ( $submodules ) {
+			$this->load_submodules();
+		}
 	}
 
 	/**

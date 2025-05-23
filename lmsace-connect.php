@@ -166,8 +166,7 @@ if ( ! defined( 'LAC_PLUGIN_FILE' ) ) {
 	define( 'LAC_PLUGIN_FILE', __FILE__ );
 }
 
-if ( !class_exists('LACONN_Main') ) {
-
+if ( !class_exists('LACONN') ) {
 	// Initialize LACONN components.
 	// Contains all the functional parts inclusion.
 	require_once( __DIR__ .'/includes/class-lac.php' );
@@ -255,7 +254,7 @@ if ( !class_exists('LACONN_Main') ) {
 	/**
 	 * Create Main class object.
 	 *
-	 * @return LACONN_Main object
+	 * @return LACONN object
 	 */
 	function LACONN() {
 		return LACONN::instance();
@@ -273,7 +272,6 @@ if ( !class_exists('LACONN_Main') ) {
 	global $LACONN;
 	$LACONN = LACONN();
 	$LACONN->init();
-
 	// TODO: Update the course product meta to array.
 
 	// HPOS compatibility declaration for WooCommerce 7.1+
