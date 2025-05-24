@@ -13,6 +13,18 @@ class LACONN_Course extends LACONN_Main {
 	 */
 	public $user;
 
+	/**
+	 * Admin class object.
+	 * @var Object
+	 */
+	public $admin;
+
+	/**
+	 * Woocommerce class object.
+	 * @var LACONN_Woocom
+	 */
+	public $woocom;
+
 	function __construct() {
 		parent::__construct();
 		// Get current logged in user data object.
@@ -417,7 +429,6 @@ class LACONN_Course extends LACONN_Main {
 		$product->set_status(($course->visible && !$make_draft) ? 'publish' : 'draft');
 		// Properties like SKU, virtual, downloadable, price etc., will be set in update_course_meta
 
-		$product->set_reviews_allowed(false);
 		$product->set_menu_order(0);
 		$product->set_date_created(current_time('timestamp'));
 		$product->set_date_modified(current_time('timestamp'));
@@ -577,9 +588,6 @@ class LACONN_Course extends LACONN_Main {
 		// Stock Status
 		$product->set_stock_status('instock');
 
-		// Sales - typically managed by WC, but can be initialized/reset
-		$product->set_total_sales(0);
-
 		// Product Type Flags
 		$product->set_downloadable(false); // Courses are not downloadable files
 		$product->set_virtual(true);    // Courses are virtual products
@@ -587,14 +595,6 @@ class LACONN_Course extends LACONN_Main {
 		// Pricing
 		$product->set_regular_price('0'); // Default price, can be configured elsewhere if needed
 		$product->set_sale_price('');     // Default, no sale price
-
-		// Other Flags
-		$product->set_featured(false);
-		$product->set_sold_individually(false); // Usually false for courses unless specified
-
-		// Inventory Settings
-		$product->set_manage_stock(false); // No stock management for virtual courses
-		$product->set_backorders('no');    // Not applicable if not managing stock
 
 		// Custom Meta: LACONN_MOODLE_COURSE_ID
 		// LAConnect support multiple courses link with single product (though current logic stores one).
@@ -604,9 +604,6 @@ class LACONN_Course extends LACONN_Main {
 		} else {
 			update_post_meta($product_id, LACONN_MOODLE_COURSE_ID, $courses_meta_value);
 		}
-
-		// Note: The original _product_attributes line was removed as it was likely incorrect.
-		// Categories are assigned via wp_set_object_terms in create_course/update_course.
 	}
 
 	/**
