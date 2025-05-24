@@ -236,7 +236,7 @@ class LACONN_User extends LACONN_Main {
 			'auth' => 'manual',
 			'firstname' => $firstname,
 			'lastname' => $lastname,
-			'email' => $user_data->email
+			'email' =>  $userdata->email ?? $user_data->user_email,
 		);
 
 
@@ -377,8 +377,8 @@ class LACONN_User extends LACONN_Main {
 					// Moodle course id synced with the selected product.
 					if ( $orderdata['status'] == 'completed' ) {
 						$courses = ($order instanceof \Automattic\WooCommerce\Admin\Overrides\Order)
-							? $order->get_meta('lac_enrolments', true) : get_post_meta($order->id, 'lac_enrolments', true);
-						$enrolments = array_merge($enrolments, $courses);
+							? $order->get_meta('lac_enrolments', true) : get_post_meta($order->id, 'lac_enrolments', true);							
+						$enrolments = array_merge($enrolments, $courses ?: []);
 					}
 				}
 			}

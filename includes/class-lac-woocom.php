@@ -214,6 +214,10 @@ class LACONN_Woocom extends LACONN_Main {
 				$md_user_id = $LACONN->User->is_moodle_user( $user_id, true, $details['user'] );
 
 				if ( $md_user_id ) {
+
+					// Fix - Multiple course products in the order. Not enrol other then first course. Resolves #10.
+					$metaenrols = $enrolments = [];
+
 					// Enrol the user in each orderer item/course.
 					$metaenrols = [];
 					$enrolments = [];
