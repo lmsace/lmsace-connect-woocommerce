@@ -27,6 +27,13 @@ class LACONN_Log extends LACONN_Main {
     public static $instance;
 
 	/**
+	 * Path to the log directory.
+	 *
+	 * @var string
+	 */
+	public $logpath;
+
+	/**
 	 * Constructor.
 	 */
     public function __construct() {
@@ -96,7 +103,7 @@ class LACONN_Log extends LACONN_Main {
 	 * @return string
 	 */
     public function get_filepath( $method ) {
-        $filename = $method.'-'.sanitize_file_name( wp_hash( $method ) ).'.log';
+        $filename = $method.'-'.sanitize_file_name($method).'.log';
         return $this->logpath.$filename;
     }
 

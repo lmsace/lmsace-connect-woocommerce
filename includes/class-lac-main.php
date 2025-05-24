@@ -36,6 +36,13 @@ class LACONN_Main {
 	public $site_url;
 
 	/**
+	 * Plugin options.
+	 *
+	 * @var array
+	 */
+	public $options;
+
+	/**
 	 * Construct method contains site connection details.
 	 *
 	 * @param boolean $helpers [description]

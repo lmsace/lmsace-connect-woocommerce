@@ -78,8 +78,10 @@ class LACONNMOD_SSO extends LACONN {
 	 * @return null
 	 */
 	public function register_actions() {
+
+
+		add_filter( 'lmsace_connect_get_services', array( $this, 'get_services' ));
 		parent::register_actions();
-		add_filter( 'lmsace_connect_get_services', array($this, 'get_services' ));
 	}
 
 	/**
@@ -90,6 +92,7 @@ class LACONNMOD_SSO extends LACONN {
 	 * @return void
 	 */
 	public function get_services( $services ) {
+
 		$services += [
 			'get_courses_detail_by_field' => 'lacpro_coursedata_get_courses_detail_by_field',
 			'generate_userloginkey' => 'auth_lmsace_connect_generate_userloginkey',
@@ -101,6 +104,7 @@ class LACONNMOD_SSO extends LACONN {
 		if (isset($options['auth_method']) && $options['auth_method'] == 'lmsace_connect') {
 			$services['create_users'] = 'auth_lmsace_connect_generate_userloginkey';
 		}
+
 		return $services;
 	}
 }

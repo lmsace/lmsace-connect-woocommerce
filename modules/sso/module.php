@@ -36,4 +36,4 @@ function LACONN_MOD_SSO() {
 global $LACONN;
 
 $LACONN_MOD_SSO = LACONN_MOD_SSO();
-$LACONN_MOD_SSO->init();
+$LACONN_MOD_SSO->init( false );

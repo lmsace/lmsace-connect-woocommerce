@@ -23,14 +23,16 @@ class LACONNMOD_SSO_Admin extends LACONN_Admin {
 	 */
 	public $instance;
 
+	public $sso;
+
 	/**
 	 * Returns an instance of the plugin object
 	 *
 	 * @return instance LACONN Admin instance
 	 */
 	public static function instance() {
-		if ( ! isset( self::$instance ) && ! ( self::$instance instanceof LACONNPRO_Admin ) ) {
-			self::$instance = new LACONNPRO_Admin;
+		if ( ! isset( self::$instance ) && ! ( self::$instance instanceof self ) ) {
+			self::$instance = new self;
 		}
 		return self::$instance;
 	}
@@ -41,6 +43,11 @@ class LACONNMOD_SSO_Admin extends LACONN_Admin {
 	 * @return void
 	 */
     public function lac_register_admin_actions() {
+		global $LACONN;
+
+		// Check if the SSO is enabled or not.
+		$this->sso = $LACONN->Client->confirm_service( LACONN::services('generate_userloginkey') ) ? true : false;
+
 		add_action( 'lmsace_connect_register_setting_fields', array( $this, 'register_setting_fields' ) );
 	}
 
@@ -112,7 +119,11 @@ class LACONNMOD_SSO_Admin extends LACONN_Admin {
 	public function redirectless_config() {
 		$options = get_option('lac_sso_settings');
 		?>
-			<input type="checkbox" id="redirectless_login" name='lac_sso_settings[redirectless_login]' class="form" value="1" <?php echo isset($options['redirectless_login']) && $options['redirectless_login'] ? "checked" : ''; ?> >
+			<input type="checkbox"
+				id="redirectless_login" name='lac_sso_settings[redirectless_login]' class="form" value="1"
+				<?php echo $this->sso ? '' : ' disabled="true" '; ?>
+				<?php echo isset($options['redirectless_login']) && $options['redirectless_login'] ? " checked " : ''; ?>
+			>
 			<label for="redirectless_login"> Enable </label>
 		<?php
 	}
@@ -125,7 +136,10 @@ class LACONNMOD_SSO_Admin extends LACONN_Admin {
 	public function create_registration_config() {
 		$options = get_option('lac_sso_settings');
 		?>
-			<input type="checkbox" id="create_onregister" name='lac_sso_settings[create_onregister]' class="form" value="1" <?php echo isset($options['create_onregister']) && $options['create_onregister'] ? "checked" : ''; ?> >
+			<input type="checkbox" id="create_onregister" name='lac_sso_settings[create_onregister]' class="form" value="1"
+				<?php echo $this->sso ? '' : 'disabled="true"'; ?>
+			 	<?php echo isset($options['create_onregister']) && $options['create_onregister'] ? "checked" : ''; ?>
+			 >
 			<label for="create_onregister"> Enable </label>
 		<?php
 	}
@@ -138,7 +152,7 @@ class LACONNMOD_SSO_Admin extends LACONN_Admin {
 	public function login_lms() {
 		$options = get_option('lac_sso_settings');
 		?>
-		<select  id="login_lms" name='lac_sso_settings[login_lms]'>
+		<select  id="login_lms" name='lac_sso_settings[login_lms]' <?php echo $this->sso ? '' : ' disabled '; ?> >
 			<option value="login" <?php echo isset($options['login_lms']) && $options['login_lms'] == "login" ? "selected" : ''; ?> >
 				<?php echo __('Login on WP', 'lmsace-connect'); ?>
 			</option>
@@ -157,7 +171,7 @@ class LACONNMOD_SSO_Admin extends LACONN_Admin {
 	public function auth_method_config() {
 		$options = get_option('lac_sso_settings');
 		?>
-		<select  id="auth_method" name='lac_sso_settings[auth_method]'>
+		<select  id="auth_method" name='lac_sso_settings[auth_method]' <?php echo $this->sso ? '' : ' disabled '; ?>>
 			<option value="manual" <?php echo isset($options['auth_method']) && $options['auth_method'] == "manual" ? "selected" : ''; ?> >
 				<?php echo __('Manual'); ?>
 			</option>
@@ -184,6 +198,11 @@ class LACONNMOD_SSO_Admin extends LACONN_Admin {
 	 */
 	public function sso_config_section() {
 		esc_html_e('Configure SSO to sign in to LMS automatically with WordPress login', 'lmsace-connect');
+
+		if ( ! $this->sso ) {
+			$url = 'https://github.com/lmsace/lmsace-connect-moodleauth/releases';
+			echo '<p class="description" style="color:var(--wc-orange);">' . __('Authentication plugin <a href="'.$url.'">auth_lmsace_connect</a> is not installed on your LMS. Please install to enable the SSO.', 'lmsace-connect') . '</p>';
+		}
 	}
 
 }

@@ -13,6 +13,18 @@ class LACONN_Course extends LACONN_Main {
 	 */
 	public $user;
 
+	/**
+	 * Admin class object.
+	 * @var Object
+	 */
+	public $admin;
+
+	/**
+	 * Woocommerce class object.
+	 * @var LACONN_Woocom
+	 */
+	public $woocom;
+
 	function __construct() {
 		parent::__construct();
 		// Get current logged in user data object.
@@ -398,7 +410,7 @@ class LACONN_Course extends LACONN_Main {
 	}
 
 	/**
-	 * Create course in WooCommerce product.
+	 * Create course in WooCommerce product using WooCommerce CRUD methods.
 	 *
 	 * @param object $course
 	 * @param bool $assign_category
@@ -407,71 +419,73 @@ class LACONN_Course extends LACONN_Main {
 	 */
 	public function create_course($course, $assign_category=false, $make_draft=false, $options=[]) {
 		global $LACONN;
+		// Use WooCommerce CRUD API
+		if (!class_exists('WC_Product_Simple')) {
+			return false;
+		}
+		$product = new WC_Product_Simple();
+		$product->set_name($course->fullname);
+		$product->set_description($course->summary);
+		$product->set_status(($course->visible && !$make_draft) ? 'publish' : 'draft');
+		// Properties like SKU, virtual, downloadable, price etc., will be set in update_course_meta
 
-		$post = array(
-			'post_author' => $this->user->ID,
-			'post_title' => $course->fullname,
-			'post_content' => $course->summary,
-			'post_status' => ($course->visible && !$make_draft) ? 'publish' : 'draft',
-			'post_type' => 'product',
-		);
-		// Insert courses as product post.
-		if ($post_id = wp_insert_post($post, true) ) {
-			// Update the course summary.
-			$summary = $this->admin->replace_coursesummary_images($post_id, $course);
-			$postcontent = [ 'ID' => $post_id, 'post_content' => $summary ];
+		$product->set_menu_order(0);
+		$product->set_date_created(current_time('timestamp'));
+		$product->set_date_modified(current_time('timestamp'));
 
-			wp_update_post( $postcontent, true );
+		$product_id = $product->save();
 
-			wp_set_object_terms( $post_id, 'simple', 'product_type' );
+		if ($product_id) {
+			// Set product type explicitly
+			wp_set_object_terms($product_id, 'simple', 'product_type');
 
+			// Set categories
 			if ($assign_category) {
-
 				$terms = $this->get_term_from_moodle_categoryid($course->categoryid);
+				$categories = array();
 				if (!empty($terms) && $terms != null) {
-					foreach ($terms as $key => $term) {
-						$categories[] = $term->name;
+					foreach ($terms as $term) {
+						$categories[] = $term->term_id;
 					}
-					wp_set_object_terms( $post_id, $categories, 'product_cat' );
+					wp_set_object_terms($product_id, $categories, 'product_cat');
 				} else {
-					// Retrieve the list of categories from the Moodle.
 					$result = $LACONN->Client->request(LACONN::services('get_categories'), array(
 						'criteria' => array([
 							'key' => 'id',
 							'value' => $course->categoryid
 						])
 					));
-					// Test the result has issue and Retrieve the result from the category fetch response.
-					// Check response has not have any issues.
 					if (!empty($result)) {
-						// Create fetched categories into wp terms.
 						$this->create_categories($result);
 					}
-
 					$terms = $this->get_term_from_moodle_categoryid($course->categoryid);
-
-					if (!empty($terms) ) {
-						foreach ($terms as $key => $term) {
-							$categories[] = $term->name;
+					if (!empty($terms)) {
+						foreach ($terms as $term) {
+							$categories[] = $term->term_id;
 						}
-						wp_set_object_terms( $post_id, $categories, 'product_cat' );
+						wp_set_object_terms($product_id, $categories, 'product_cat');
 					}
 				}
 			}
 
-			$this->update_course_meta($post_id, $course, $make_draft);
-			// Create course images into product.
-			$image = $this->admin->get_course_image($course);
-			$this->upload_product_image($post_id, [$image]);
+			// Update course meta using the new centralized method
+			$this->update_course_meta($product, $course); // Pass WC_Product object
 
+			// Course summary images
+			$summary = $this->admin->replace_coursesummary_images($product_id, $course);
+			$postcontent = [ 'ID' => $product_id, 'post_content' => $summary ];
+			wp_update_post($postcontent, true);
+
+			// Product image
+			$image = $this->admin->get_course_image($course);
+			$this->upload_product_image($product_id, [$image]);
 			return true;
 		}
-
 		return false;
 	}
 
 	/**
-	 * Update the already linked course product with current course content.
+	 * Update the already linked course product with current course content using WooCommerce CRUD methods.
 	 *
 	 * @param int $post_id
 	 * @param object $course
@@ -481,110 +495,115 @@ class LACONN_Course extends LACONN_Main {
 	 */
 	public function update_course($post_id, $course, $assign_category=false, $make_draft=false, $options=[]) {
 		global $LACONN;
-		$post = array(
-			'ID' => $post_id,
-			'post_author' => $this->user->ID,
-			'post_title' => $course->fullname,
-			'post_content' => $course->summary,
-			'post_status' => ($course->visible && !$make_draft) ? 'publish' : 'draft',
-			'post_type' => 'product',
-		);
-
-		$summary = $this->admin->replace_coursesummary_images($post_id, $course);
-		$summary = '[lmsace_connect_summary]'.$summary.'[/lmsace_connect_summary]';
-
-
-		$currentpost = get_post($post_id);
-		if ($currentpost != '') {
-			$postcontent = $currentpost->post_content;
-			if (has_shortcode($postcontent, 'lmsace_connect_summary')) {
-				$pattern = get_shortcode_regex();
-				$summary = preg_replace('/'. $pattern .'/s', $summary, $postcontent);
-			}
-		}
-		$post['post_content'] = $summary;
-
-        // update course details in product post.
-		$postid = wp_update_post($post, true);
-
-		if ( is_wp_error($post_id) ) {
+		if (!class_exists('WC_Product_Simple')) {
 			return false;
-		} else {
+		}
+		$product = wc_get_product($post_id);
+		if (!$product) {
+			return false;
+		}
 
-			wp_set_object_terms( $post_id, 'simple', 'product_type' );
+		$product->set_name($course->fullname);
+		$product->set_description($course->summary);
+		$product->set_status(($course->visible && !$make_draft) ? 'publish' : 'draft');
+		// Properties like SKU, virtual, downloadable, price etc., will be set in update_course_meta
 
+		$product->set_reviews_allowed(false);
+		$product->set_menu_order(0);
+		$product->set_date_modified(current_time('timestamp'));
+
+		$product_id = $product->save();
+
+		if ($product_id) {
+			wp_set_object_terms($post_id, 'simple', 'product_type'); // $post_id or $product_id should be the same
 			if ($assign_category) {
 				$terms = $this->get_term_from_moodle_categoryid($course->categoryid);
+				$categories = array();
 				if (!empty($terms)) {
-					foreach ($terms as $key => $term) {
-						$categories[] = $term->name;
+					foreach ($terms as $term) {
+						$categories[] = $term->term_id;
 					}
-					wp_set_object_terms( $post_id, $categories, 'product_cat' );
+					wp_set_object_terms($post_id, $categories, 'product_cat');
 				} else {
-					// Retrieve the list of categories from the Moodle.
 					$result = $LACONN->Client->request(LACONN::services('get_categories'), array(
 						'criteria' => array([
 							'key' => 'id',
 							'value' => $course->categoryid
 						])
 					));
-					// Test the result has issue and Retrieve the result from the category fetch response.
-					// Check response has not have any issues.
 					if (!empty($result)) {
-						// Create fetched categories into wp terms.
 						$this->create_categories($result);
 					}
-
 					$terms = $this->get_term_from_moodle_categoryid($course->categoryid);
-					if (!empty($terms) ) {
-						foreach ($terms as $key => $term) {
-							$categories[] = $term->name;
+					if (!empty($terms)) {
+						foreach ($terms as $term) {
+							$categories[] = $term->term_id;
 						}
-						wp_set_object_terms( $post_id, $categories, 'product_cat' );
+						wp_set_object_terms($post_id, $categories, 'product_cat');
 					}
 				}
 			}
 
-			$this->update_course_meta($post_id, $course, $make_draft);
-			// update product images.
+			// Update course meta using the new centralized method
+			$this->update_course_meta($product, $course); // Pass WC_Product object
+
+			// Course summary images
+			$summary = $this->admin->replace_coursesummary_images($post_id, $course);
+			$summary = '[lmsace_connect_summary]'.$summary.'[/lmsace_connect_summary]';
+			$currentpost = get_post($post_id);
+			if ($currentpost != '') {
+				$postcontent = $currentpost->post_content;
+				if (has_shortcode($postcontent, 'lmsace_connect_summary')) {
+					$pattern = get_shortcode_regex();
+					$summary = preg_replace('/'. $pattern .'/s', $summary, $postcontent);
+				}
+			}
+			$postarr = array('ID' => $post_id, 'post_content' => $summary);
+			wp_update_post($postarr, true);
+
+			// Product image
 			$image = $this->admin->get_course_image($course);
 			$this->upload_product_image($post_id, [$image]);
-
 			return true;
 		}
+		return false;
 	}
 
 	/**
-	 * Update the product meta data based on the course object.
+	 * Update the product meta data based on the course object using WC_Product methods.
 	 *
-	 * @param int $post_id
-	 * @param object $course
+	 * @param WC_Product $product The WooCommerce product object.
+	 * @param object $course The course data object from Moodle.
 	 * @return void
 	 */
-	public function update_course_meta($post_id, $course) {
+	public function update_course_meta(WC_Product $product, $course) {
+		$product_id = $product->get_id();
 
-	    update_post_meta( $post_id, '_product_attributes',  array('term_id' => $course->categoryid) );
-	    update_post_meta( $post_id, '_sku', $course->shortname );
-		update_post_meta( $post_id, '_visibility', ($course->visible) ? 'visible' : 'hide' );
-		// LAConnect support multiple courses link with single product.
-		$courses = array( $course->id );
-		if ( ! metadata_exists('post', $post_id, LACONN_MOODLE_COURSE_ID) ) {
-	    	add_post_meta( $post_id, LACONN_MOODLE_COURSE_ID, $courses);
+		// SKU
+		$product->set_sku($course->shortname);
+
+		// Catalog Visibility
+		$product->set_catalog_visibility(($course->visible) ? 'visible' : 'hidden');
+
+		// Stock Status
+		$product->set_stock_status('instock');
+
+		// Product Type Flags
+		$product->set_downloadable(false); // Courses are not downloadable files
+		$product->set_virtual(true);    // Courses are virtual products
+
+		// Pricing
+		$product->set_regular_price('0'); // Default price, can be configured elsewhere if needed
+		$product->set_sale_price('');     // Default, no sale price
+
+		// Custom Meta: LACONN_MOODLE_COURSE_ID
+		// LAConnect support multiple courses link with single product (though current logic stores one).
+		$courses_meta_value = array($course->id);
+		if (!metadata_exists('post', $product_id, LACONN_MOODLE_COURSE_ID)) {
+			add_post_meta($product_id, LACONN_MOODLE_COURSE_ID, $courses_meta_value);
 		} else {
-	    	update_post_meta( $post_id, LACONN_MOODLE_COURSE_ID, $courses);
+			update_post_meta($product_id, LACONN_MOODLE_COURSE_ID, $courses_meta_value);
 		}
-
-	    update_post_meta( $post_id, '_stock_status', 'instock');
-	    update_post_meta( $post_id, 'total_sales', '0' );
-	    update_post_meta( $post_id, '_downloadable', 'no' );
-	    update_post_meta( $post_id, '_virtual', 'yes' );
-	    update_post_meta( $post_id, '_regular_price', '00' );
-	    update_post_meta( $post_id, '_sale_price', '' );
-	    update_post_meta( $post_id, '_featured', 'no' );
-	    update_post_meta( $post_id, '_sold_individually', '' );
-	    update_post_meta( $post_id, '_manage_stock', 'no' );
-	    update_post_meta( $post_id, '_backorders', 'no' );
-	    update_post_meta( $post_id, '_stock', '' );
 	}
 
 	/**

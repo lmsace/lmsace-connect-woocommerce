@@ -17,6 +17,7 @@ if ( !empty($courses) ) {
 		<div class="product-row row">
 
 	<?php
+	$thiscourseurl = '';
 	$loginurl = apply_filters( 'lmsace_connect_courseurl', $thiscourseurl );
 
 	$courseids = array_column($courses, 'courseid');

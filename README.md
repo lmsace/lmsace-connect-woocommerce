@@ -119,3 +119,11 @@ You feel LMSACE Connect helps you to sell courses easier. "**Give a review and r
      - Single Sign ON
      - Bundle courses in a product.
      - Import course data.
+
+3. Version 3.0 ( Release on 24 May 2025 )
+
+     - Improved to support PHP 8.2
+     - Include woocommerce HPOS support
+     - Bugfix: Missing courses when purchases more than one course #10
+     - Bugfix: Site health security issue on health panel #6
+

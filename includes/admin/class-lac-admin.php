@@ -24,6 +24,13 @@ class LACONN_Admin extends LACONN_Main {
 	public $instance;
 
 	/**
+	 * LMSACE Connect Admin Request handler instance.
+	 *
+	 * @var LACONN_Admin_request
+	 */
+	public $admin_request;
+
+	/**
 	 * Returns an instance of the plugin object
 	 *
 	 * @return instance LACONN Admin instance
@@ -740,7 +747,7 @@ class LACONN_Admin extends LACONN_Main {
 		</p>
 		<p>
 	    	<input id="import_course_details" type="checkbox" name="lac_import_settings[import_options][]" value="course_details" >
-	    	<label for="import_course_details"> <?php echo esc_html( __('Import selected courses with its details summary.') ); ?> </label>
+	    	<label for="import_course_details"> <?php echo esc_html( __('Import selected courses with its syllabus summary.') ); ?> </label>
 		</p>
     <?php
 		do_action( 'lmsace_connect_import_settings_list', $options );

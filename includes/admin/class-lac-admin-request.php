@@ -20,6 +20,20 @@ class LACONN_Admin_request extends LACONN_Main {
 	public $courseSync;
 
 	/**
+	 * Client instance for making requests.
+	 *
+	 * @var LACONN_Client
+	 */
+	public $client;
+
+	/**
+	 * Options property to prevent dynamic property creation deprecation notice.
+	 *
+	 * @var mixed
+	 */
+	public $options;
+
+	/**
 	 * Call the main class contructor to prepare basic data.
 	 */
 	function __construct() {
@@ -104,7 +118,7 @@ class LACONN_Admin_request extends LACONN_Main {
 						$counts = $status['response_body'];
 						$count = (count($counts['created'])) ? count($counts['created']).' courses created, ' : ' No courses created, ';
 						$count .= (count($counts['updated'])) ? count($counts['updated']).' courses updated, ' : ' No courses updated, ';
-						$count .= (count($counts['existing'])) ? count($counts['existing']).' courses exists. ' : '';					
+						$count .= (count($counts['existing'])) ? count($counts['existing']).' courses exists. ' : '';
 					}
 
 					$result = array('error' => false, 'message' => '<span class="connection-success">'.

@@ -228,6 +228,28 @@ class LACONN_Client {
 		return $result;
 	}
 
+	/**
+	 * Check the service is available or not in Moodle LMS.
+	 *
+	 * @param string $service Service name to check.
+	 * @return bool
+	 */
+	public function confirm_service( $service ) {
+		// Check the service is available or not.
+		$response = $this->request('core_webservice_get_site_info', array());
 
+		if (empty($response->functions)) {
+			return false;
+		}
+
+		$functions = $response->functions;
+		foreach ($functions as $function) {
+			if ($function->name == $service) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 }

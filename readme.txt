@@ -2,9 +2,9 @@
 Contributors: lmsace
 Tags: LACONN, woocommerce-moodle-integration, moodle-woocommerce-integration, moodle, woocommerce, LMS, moodle+woocommerce, course, course-product, course-purchase, sell-course, buy-course, sell-moodle-course, lmsace-connect, moodle-sso, moodle-wordpress-sso, moodle-woocommerce-sso
 Requires at least: 4.6
-Tested up to: 6.2.2
+Tested up to: 6.8.1
 Requires PHP: 5.6
-Stable tag: 2.0
+Stable tag: 3.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -23,7 +23,7 @@ This plugin is an extension of WooCommerce, which allows you to sell your Moodle
 - After a successful product purchase in Woocommerce, the integration will auto-enroll the customer into the Moodle™ course(s) so that they can begin taking the course.
 - Removes users from Moodle™ courses when refunded or cancelling a Woocommerce order.
 - Seamless login with SSO
-- Import course outline data effortlessly.
+- Import courses with its syllabus summary.
 
 **Benefits of integrating Moodle™ LMS with Woocommerce Store**
 
@@ -58,7 +58,7 @@ If you love our plugin, please give us a full five-star rating so that we know t
 - PHP version 5.6 or higher
 - WordPress 4.7 or higher 
 - WooCommerce 3.0 or higher
-- Moodle™ 3.7 or higher
+- Moodle™ 3.7 or higher (5X supports)
 - Administrative access to your WordPress and Moodle™ site
 
 = Automatic installation =
@@ -129,3 +129,10 @@ Initial release. No upgrade notices
 SSO feature implemented.
 Bundle multiple courses in a single product.
 Import course with outline data.
+
+= 3.0 =
+Improved to support PHP 8.2
+Include woocommerce HPOS support
+Bugfix: Missing courses when purchases more than one course #10
+
+
