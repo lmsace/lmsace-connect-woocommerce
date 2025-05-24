@@ -214,7 +214,11 @@ class LACONN_Woocom extends LACONN_Main {
 				$md_user_id = $LACONN->User->is_moodle_user( $user_id, true, $details['user'] );
 
 				if ( $md_user_id ) {
+
 					// Enrol the user in each orderer item/course.
+					
+					$metaenrols = [];
+					$enrolments = [];
 					foreach ( $details['products'] as $product ) {
 						// Get post id of the order item.
 						$product_id = $product->get_product_id();
@@ -223,7 +227,6 @@ class LACONN_Woocom extends LACONN_Main {
 
 						$md_courses = (!is_array($md_courses)) ? array($md_courses) : $md_courses;
 
-						$metaenrols = $enrolments = [];
 						foreach ( $md_courses as $md_course_id ) {
 							// Enrol the user in the course in lms environment.
 							if ( !empty($md_course_id) ) {
@@ -237,7 +240,7 @@ class LACONN_Woocom extends LACONN_Main {
 								$enrolments[] = $enrols;
 
 								$LACONN->logger()->add( 'order',
-									' Preparing enrolment - "'.$product_id.'" ('.json_encode( $enrolments ).') ' );
+								' Preparing enrolment - "'.$product_id.'" ('.json_encode( $enrolments ).') ' );
 							}
 						}
 					}

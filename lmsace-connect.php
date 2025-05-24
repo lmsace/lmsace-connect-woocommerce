@@ -118,6 +118,12 @@ if ( !class_exists('LACONN_Main') ) {
 	 * @return LACONN_Main object
 	 */
 	function LACONN() {
+		// Checks if there's any open session and close it for security issues
+		if ( session_status() === PHP_SESSION_ACTIVE ) {
+			session_write_close();
+		}
+
+		// Create the LACONN_Main
 		return LACONN::instance();
 	}
 
