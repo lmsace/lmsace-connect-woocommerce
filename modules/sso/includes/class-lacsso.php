@@ -20,6 +20,10 @@ class LACONNMOD_SSO extends LACONN {
 
 	public const KEY = 'LACONNMOD_SSO_';
 
+	public $MODUser;
+
+	public $MODAdmin;
+
     /**
 	 * Returns an instance of the plugin object
 	 *
@@ -53,10 +57,10 @@ class LACONNMOD_SSO extends LACONN {
 	 */
     public function includes() {
 
-        $this->handlers['LACONNMOD_SSO_User'] = include_once($this->dirroot.'/modules/sso/includes/class-lacsso-user.php');
+        $this->handlers['LACONNMOD_SSO_MODUser'] = include_once($this->dirroot.'/modules/sso/includes/class-lacsso-user.php');
 		// Only for the admin side.
 		if ( is_admin() ) {
-            $this->handlers['LACONNMOD_SSO_Admin'] = include_once($this->dirroot.'/modules/sso/includes/admin/class-lacsso-admin.php');
+            $this->handlers['LACONNMOD_SSO_MODAdmin'] = include_once($this->dirroot.'/modules/sso/includes/admin/class-lacsso-admin.php');
         }
 
 		// Register the handlers, create class instance and create class variable, $this->User, $this->Admin.

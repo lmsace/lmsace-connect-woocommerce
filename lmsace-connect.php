@@ -3,7 +3,7 @@
  * Plugin Name: LMSACE Connect - WooCommerce Moodle™ LMS Integration
  * Plugin URI: http://lmsace.com/product/lmsace-connect
  * Description: This plugin connects the Moodle™ LMS + WooCommerce. Helps course creators to sell their Moodle™ LMS courses via WooCommerce.
- * Version: 3.0
+ * Version: 3.3
  * Author: LMSACE
  * Author URI: https://www.lmsace.com/
  * Requires at least: 4.6+

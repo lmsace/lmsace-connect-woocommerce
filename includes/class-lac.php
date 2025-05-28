@@ -37,9 +37,25 @@ class LACONN {
 	 */
 	public $site_url;
 
+	/**
+	 * Handlers for the plugin.
+	 * @var array
+	 */
 	public $handlers;
 
+	/**
+	 * Options for the plugin.
+	 * @var array
+	 */
 	public $options;
+
+	// Declare handler properties to avoid dynamic property creation in PHP 8.2+ - Quick Fix
+	public $Client;
+	public $User;
+	public $Course;
+	public $Woocom;
+	public $Log;
+	public $Admin;
 
 	public const KEY = 'LACONN_';
 
